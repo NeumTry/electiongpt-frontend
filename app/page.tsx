@@ -60,9 +60,9 @@ export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit, data } = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
-  const chatContainerRef = useRef(null);
+  const chatContainerRef = useRef<any>({});
 
-  const DrawerHeader = styled('div')(({ theme }) => ({
+  const DrawerHeader = styled('div')(({ theme }:any) => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 2),
