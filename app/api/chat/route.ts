@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: [...prompt, ...messages.filter((message) => message.role === 'user')],
+      messages: [...prompt, ...messages.filter((message:any) => message.role === 'user')],
     });
   
     // Convert the response into a friendly text-stream

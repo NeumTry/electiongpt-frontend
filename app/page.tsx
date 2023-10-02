@@ -77,11 +77,11 @@ export default function Chat() {
     setSidebarOpen(true);
   };
 
-  const handleCandidateChosenClick = (candidate) => () => {
+  const handleCandidateChosenClick = (candidate:any) => () => {
     setCandidateChosen(candidate)
   };
 
-  const handleSubmitForm = (e) => {
+  const handleSubmitForm = (e:any) => {
     if(candidateChosen.name === ""){
       console.log("please choose a candidate!")
       setSnackbarOpen(true);
@@ -198,7 +198,7 @@ export default function Chat() {
         </Typography>
         <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
           {messages.length > 0
-          ? messages.map((m, index) => (
+          ? messages.map((m:any, index:any) => (
               <div key={m.id} className={`message-container ${m.role}`}>
                 <div className="message-content">
                   <div className="icon-container">
