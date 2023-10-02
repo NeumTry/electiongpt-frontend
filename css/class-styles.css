@@ -1,0 +1,118 @@
+.flex {
+  display: flex;
+}
+
+.stretch {
+  flex: 1;
+}
+
+.stretch {
+  max-width: 800px; /* Adjust the value to expand the chat area */
+}
+
+.message-container {
+  margin-bottom: 10px;
+}
+.message-container::-webkit-scrollbar {
+  width: 0; /* This will hide the scrollbar on WebKit browsers (e.g., Chrome, Safari) */
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+}
+
+.icon-container {
+  margin-right: 10px;
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.user.icon {
+  color: #007bff;
+}
+
+.ai.icon {
+  color: #4caf50;
+}
+
+.divider {
+  height: 2px;
+  background-color: #ccc;
+  width: 100%;
+  margin: 10px 0;
+}
+.submission-form {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.submission-input {
+  flex-grow: 1;
+  padding: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  width: 100%;
+}
+
+.submission-button-color-republican{
+  background-color: #bd0b0b;
+}
+
+.submission-button-color-democratic{
+  background-color: #1d47d0;
+}
+
+.submission-button-color-standard{
+  background-color: rgb(0, 0, 0);
+}
+
+.submission-button-color-republican:hover {
+  background-color: rgb(151, 4, 4);
+}
+
+.submission-button-color-democratic:hover {
+  background-color: rgb(51, 104, 240);
+}
+
+.submission-button-color-standard:hover {
+  background-color: #2c2c2c;
+}
+
+
+.submission-button {
+  padding: 8px 16px;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.main-content {
+  transition: margin-left 0.3s;
+  margin-bottom: 50px;
+}
+.main-content.shifted {
+  margin-left: 250px; /* Adjust the value based on your sidebar width */
+}
+
+.chat-container {
+  background-color: #f5f5f5; /* Add your preferred shade of grey here */
+}
+
+.header-background {
+  background-color: #ffffff !important
+}
