@@ -35,50 +35,6 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
         <MemoizedReactMarkdown
           className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
           remarkPlugins={[remarkGfm, remarkMath]}
-          components={{
-            ul({ children }) {
-              return <ul className="list-disc list-inside">{children}</ul>
-            },
-            ol({ children }) {
-              return <ol className="list-decimal list-inside">{children}</ol>
-            },
-            li({ children }) {
-              return <li className="mb-1">{children}</li>
-            },
-            p({ children }) {
-              return <p className="mb-2 last:mb-0">{children}</p>
-            },
-            code({ node, inline, className, children, ...props }) {
-              if (children.length) {
-                if (children[0] == '▍') {
-                  return (
-                    <span className="mt-1 cursor-default animate-pulse">▍</span>
-                  )
-                }
-
-                children[0] = (children[0] as string).replace('`▍`', '▍')
-              }
-
-              const match = /language-(\w+)/.exec(className || '')
-
-              if (inline) {
-                return (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                )
-              }
-
-              return (
-                <CodeBlock
-                  key={Math.random()}
-                  language={(match && match[1]) || ''}
-                  value={String(children).replace(/\n$/, '')}
-                  {...props}
-                />
-              )
-            }
-          }}
         >
           {message.content}
         </MemoizedReactMarkdown>
