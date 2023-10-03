@@ -23,6 +23,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRef, useEffect } from 'react';
+import { ChatMessage } from '@/components/chat-message';
 
 // //  NOTEs: 
 // add picture of the candidate instead of the AI - can we?
@@ -228,6 +229,8 @@ export default function Chat() {
             <li>Ballotpedia</li>
             <li>Candidate Websites</li>
             <li>Published government plans</li>
+            <li>Tweets</li>
+            <li>Interview transcripts</li>
             <br></br>
             <br></br>
             Behind the scenes, ElectionGPT is built on top of <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
@@ -237,19 +240,14 @@ export default function Chat() {
     <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Choose a candidate" : "Chat about " + candidateChosen.name } 
+          {candidateChosen.name == "" ? "Choose a candidate from the left sidebar" : "Chat about " + candidateChosen.name } 
         </Typography>
         <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
           {messages.length > 0
           ? messages.map((m:any, index:any) => (
               <div key={m.id} className={`message-container ${m.role}`}>
                 <div className="message-content">
-                  <div className="icon-container">
-                    {m.role === 'user' 
-                      ? <FontAwesomeIcon icon={faUser} className="icon user" />
-                      : <FontAwesomeIcon icon={faRobot} className="icon ai" />}
-                  </div>
-                  {m.content}
+                  <ChatMessage message={m} />
                 </div>
                 <br></br>
                 {index !== messages.length - 1 && <div className="divider" />}

@@ -24,6 +24,7 @@
 
 .icon-container {
   margin-right: 10px;
+  min-width: 30px;
 }
 
 .icon {
