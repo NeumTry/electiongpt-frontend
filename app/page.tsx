@@ -236,8 +236,8 @@ export default function Chat() {
     </Drawer>
     <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
-        <Typography variant="h3" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Choose a candidate" : "Candidate: " + candidateChosen.name } 
+        <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
+          {candidateChosen.name == "" ? "Choose a candidate" : "Chat about " + candidateChosen.name } 
         </Typography>
         <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
           {messages.length > 0
