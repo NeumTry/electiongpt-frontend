@@ -244,7 +244,7 @@ export default function Chat() {
     <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Choose a candidate from the left sidebar" : "Chat about " + candidateChosen.name } 
+          {candidateChosen.name == "" ? "Choose a candidate in the menu" : "Chat about " + candidateChosen.name } 
         </Typography>
         <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
           {messages.length > 0
