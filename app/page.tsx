@@ -17,9 +17,11 @@ import Button from '@mui/material/Button';
 import { styled, useTheme } from '@mui/material/styles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRef, useEffect } from 'react';
 
 // //  NOTEs: 
@@ -55,11 +57,12 @@ export default function Chat() {
     {'name': 'Robert F Kennedy', 'pipeline_id': 'e65f7d7f-d679-4dd5-8a7c-97be110e54b4', 'party':'democratic'},
   ]
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const matches = useMediaQuery('(min-width:960px)');
+  const [sidebarOpen, setSidebarOpen] = useState(matches);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
   const { messages, input, handleInputChange, handleSubmit, data } = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-
   const chatContainerRef = useRef<any>({});
 
   const DrawerHeader = styled('div')(({ theme }:any) => ({
@@ -75,6 +78,10 @@ export default function Chat() {
 
   const toggleSidebar = () => {
     setSidebarOpen(true);
+  };
+
+  const toggleAbout = () => {
+    setAboutOpen(true);
   };
 
   const handleCandidateChosenClick = (candidate:any) => () => {
@@ -97,6 +104,10 @@ export default function Chat() {
     setSidebarOpen(false);
   };
 
+  const handleAboutClose = () => {
+    setAboutOpen(false);
+  };
+
   const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -110,91 +121,123 @@ export default function Chat() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    setSidebarOpen(matches);
+  }, [matches]);
+
   return (  
     <div>
-      <header className="header-background sticky top-0 z-50 flex items-center justify-between w-full h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl">
+      <header className={`header-background sticky top-0 z-50 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex items-center">
-      <IconButton onClick={toggleSidebar}>
-        <MenuIcon />
-      </IconButton>
+        {!matches && <IconButton onClick={toggleSidebar}>
+          <MenuIcon className='white-icon'/>
+        </IconButton>}
+      </div>
+      <div className="flex items-center text-[#e0e0e0]">
+        🗳️ ElectionGPT
       </div>
       <div className="flex items-center justify-end space-x-2">
-      <Button>About</Button>
+        <Button className="header-button" onClick={toggleAbout}>About</Button>
       </div>
     </header>      
-    <Drawer anchor="left" open={sidebarOpen} variant='persistent'>
+    <Drawer anchor="left" open={sidebarOpen} variant={matches ? 'permanent' : 'temporary'}>
       <div style={{width:400, paddingLeft:20, paddingRight:20}}>
-      <DrawerHeader>
-        <IconButton onClick={handleDrawerClose}>
-          {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
-      </DrawerHeader>
-      <Typography variant="h4" gutterBottom>
-        ElectionGPT
-      </Typography>
-      <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-          Built using <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
+        <DrawerHeader>
+          {!matches && <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>}
+        </DrawerHeader>
+        <Typography variant="h4" gutterBottom>
+        🗳️ ElectionGPT
         </Typography>
-        <Typography paragraph>
-        ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals.
-        <br></br>
-        <br></br>
-        Election uses Wikipedia and the Candidate's own website as data source for context.
-        <br></br>
-        <br></br>
+        <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+            Built using <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
+          </Typography>
+          <Typography paragraph>
+          ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals.
+          <br></br>
+          <br></br>
+          Pick a candidate below. List updated as of 10/2/2023.
+          <br></br>
+          <br></br>
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            List of candidates
         </Typography>
-        <Typography variant="h6" gutterBottom>
-          List of candidates
-      </Typography>
-        <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>Republican Candidates</Typography>
-        </AccordionSummary>
-        <AccordionDetails > 
-          {republicanCandidates.map( candidate =>
-          <div key={candidate.name}>
-            <Button variant="outlined" color="error" onClick={handleCandidateChosenClick(candidate)}>
-            {candidate.name}
-          </Button>
-          <br></br>
-          <br></br>
-          </div>
-          )}
-          {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
-        </AccordionDetails>
-      </Accordion>
-      <br></br>
-      <br></br>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>Democratic Candidates</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-        {democraticCandidates.map( candidate =>
-          <div key={candidate.name}>
-            <Button variant="outlined" onClick={handleCandidateChosenClick(candidate)}>
-            {candidate.name}
-          </Button>
-          <br></br>
-          <br></br>
-          </div>
-          )}
-        </AccordionDetails>
-      </Accordion>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Republican Candidates</Typography>
+            </AccordionSummary>
+          <AccordionDetails > 
+            {republicanCandidates.map( candidate =>
+            <div key={candidate.name}>
+              <Button variant="outlined" color="error" onClick={handleCandidateChosenClick(candidate)}>
+              {candidate.name}
+            </Button>
+            <br></br>
+            <br></br>
+            </div>
+            )}
+            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
+          </AccordionDetails>
+        </Accordion>
+        <br></br>
+        <br></br>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography>Democrat Candidates</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            {democraticCandidates.map( candidate =>
+              <div key={candidate.name}>
+                <Button variant="outlined" onClick={handleCandidateChosenClick(candidate)}>
+                {candidate.name}
+              </Button>
+              <br></br>
+              <br></br>
+              </div>
+              )}
+            </AccordionDetails>
+          </Accordion>
         </div>
       </Drawer>
-    <div className={`main-content ${sidebarOpen ? 'shifted' : ''}`}>
+    <Drawer anchor='right' open={aboutOpen} variant='temporary'>
+      <div style={{width:400, paddingLeft:20, paddingRight:20}}>
+        <DrawerHeader>
+          <IconButton onClick={handleAboutClose}>
+            <CloseIcon/>
+          </IconButton>
+        </DrawerHeader>
+          <Typography variant="h4" gutterBottom>
+            About
+          </Typography>
+          <Typography paragraph>
+            ElectionGPT is continously updated with data for the candidates from a variety of sources. The goal is to present an unbiased, up to date interface into each candidates government plan. We built ElectionGPT to help us understand the candidates and their perspectives outside of the noisiness of media and news; grounded on their core proposals and beliefs. 
+            <br></br>
+            <br></br>
+            ElectionGPT pulls from data sources such as:
+            <li>Wikipedia</li>
+            <li>Ballotpedia</li>
+            <li>Candidate Websites</li>
+            <li>Published government plans</li>
+            <br></br>
+            <br></br>
+            Behind the scenes, ElectionGPT is built on top of <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
+          </Typography>
+        </div>
+    </Drawer>
+    <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
         <Typography variant="h3" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Choose a candidate to chat with" : "Chatting with " + candidateChosen.name } 
+          {candidateChosen.name == "" ? "Choose a candidate" : "Candidate: " + candidateChosen.name } 
         </Typography>
         <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
           {messages.length > 0
@@ -220,15 +263,17 @@ export default function Chat() {
           Please choose a candidate before sending a message!
         </Alert>
       </Snackbar>
-        <form className="submission-form" onSubmit={handleSubmitForm}>
-          <input
-            className="submission-input"
-            value={input}
-            placeholder="Type here to chat!"
-            onChange={handleInputChange}
-          />
-          <button type="submit" className={`${candidateChosen.party == "" ? "submission-button-color-standard" : `submission-button-color-${candidateChosen.party}`} submission-button`}>Send</button>
-        </form>
+        <div className='flex justify-center items-center'>
+          <form className="submission-form mx-auto" onSubmit={handleSubmitForm}>
+            <input
+              className="submission-input"
+              value={input}
+              placeholder="Type here to chat!"
+              onChange={handleInputChange}
+            />
+            <button type="submit" className={`${candidateChosen.party == "" ? "submission-button-color-standard" : `submission-button-color-${candidateChosen.party}`} submission-button`}>Send</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>

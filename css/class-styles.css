@@ -52,10 +52,11 @@
   background-color: #fff;
   border: 1px solid #ccc;
   padding: 8px;
-  width: 90%;
+  width: 100%;
   max-width: 700px;
   border-radius: 8px;
   margin-bottom: 20px;
+  color: #2e2e2e;
 }
 
 .submission-input {
@@ -104,15 +105,25 @@
 .main-content {
   transition: margin-left 0.3s;
   margin-bottom: 50px;
+  color: #cfcfcf;
 }
 .main-content.shifted {
   margin-left: 250px; /* Adjust the value based on your sidebar width */
 }
 
 .chat-container {
-  background-color: #f5f5f5; /* Add your preferred shade of grey here */
+  background-color: #2e2e2e; /* Add your preferred shade of grey here */
 }
 
 .header-background {
-  background-color: #ffffff !important
+  background-color: #1a1a1a !important
+}
+
+.white-icon {
+  color: white;
+}
+
+.header-button {
+  color: #2196F3;
+  font-weight: 500;
 }
