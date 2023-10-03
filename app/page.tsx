@@ -246,7 +246,7 @@ export default function Chat() {
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
           {candidateChosen.name == "" ? "Choose a candidate in the menu" : "Chat about " + candidateChosen.name } 
         </Typography>
-        <div className="message-container" style={{ maxHeight: '85vh', overflowY: 'auto' }} ref={chatContainerRef}>
+        <div className="message-container px-20" style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0
           ? messages.map((m:any, index:any) => (
               <div key={m.id} className={`message-container ${m.role}`}>
@@ -265,17 +265,17 @@ export default function Chat() {
           Please choose a candidate before sending a message!
         </Alert>
       </Snackbar>
-        <div className='flex justify-center items-center'>
-          <form className="submission-form mx-auto" onSubmit={handleSubmitForm}>
-            <input
-              className="submission-input"
-              value={input}
-              placeholder="Type here to chat!"
-              onChange={handleInputChange}
-            />
-            <button type="submit" className={`${candidateChosen.party == "" ? "submission-button-color-standard" : `submission-button-color-${candidateChosen.party}`} submission-button`}>Send</button>
-          </form>
-        </div>
+      <div className='flex justify-center items-center'>
+        <form className="submission-form mx-auto" onSubmit={handleSubmitForm}>
+          <input
+            className="submission-input"
+            value={input}
+            placeholder="Type here to chat!"
+            onChange={handleInputChange}
+          />
+          <button type="submit" className={`${candidateChosen.party == "" ? "submission-button-color-standard" : `submission-button-color-${candidateChosen.party}`} submission-button`}>Send</button>
+        </form>
+      </div>
       </div>
     </div>
   </div>
