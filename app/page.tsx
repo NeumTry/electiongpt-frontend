@@ -23,6 +23,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRef, useEffect } from 'react';
+import va from '@vercel/analytics';
 
 // //  NOTEs: 
 // add picture of the candidate instead of the AI - can we?
@@ -81,10 +82,12 @@ export default function Chat() {
   };
 
   const toggleAbout = () => {
+    va.track("About button clicked")
     setAboutOpen(true);
   };
 
   const handleCandidateChosenClick = (candidate:any) => () => {
+    va.track("Clicked Candidate button",{candidate_name:candidate.name})
     setCandidateChosen(candidate)
   };
 
@@ -96,6 +99,7 @@ export default function Chat() {
       e.preventDefault()
     }
     else{
+      va.track("Sent message to chatbot", {candidate_name:candidateChosen.name})
       handleSubmit(e)
     }
   }
@@ -151,7 +155,7 @@ export default function Chat() {
         🗳️ ElectionGPT
         </Typography>
         <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-            Built using <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
+            Built using <a onClick={() => {va.track("Clicked 'on top of neum' link")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
           </Typography>
           <Typography paragraph>
           ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals. 
@@ -230,7 +234,7 @@ export default function Chat() {
             <li>Published government plans</li>
             <br></br>
             <br></br>
-            Behind the scenes, ElectionGPT is built on top of <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
+            Behind the scenes, ElectionGPT is built on top of <a onClick={() => {va.track("Clicked 'on top of neum' link in About")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a onClick={() => {va.track("Clicked 'Weaviate' link")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
           </Typography>
         </div>
     </Drawer>
