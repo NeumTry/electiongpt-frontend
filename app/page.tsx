@@ -157,7 +157,7 @@ export default function Chat() {
           ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals.
           <br></br>
           <br></br>
-          Pick a candidate below. List updated as of 10/2/2023.
+          Pick a candidate below. List updated as of 10/2/2023. 
           <br></br>
           <br></br>
           </Typography>
