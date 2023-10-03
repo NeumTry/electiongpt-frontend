@@ -36,6 +36,15 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
           className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"
           remarkPlugins={[remarkGfm, remarkMath]}
           components={{
+            ul({ children }) {
+              return <ul className="list-disc list-inside">{children}</ul>
+            },
+            ol({ children }) {
+              return <ol className="list-decimal list-inside">{children}</ol>
+            },
+            li({ children }) {
+              return <li className="mb-1">{children}</li>
+            },
             p({ children }) {
               return <p className="mb-2 last:mb-0">{children}</p>
             },
