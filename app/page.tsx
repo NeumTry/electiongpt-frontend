@@ -154,7 +154,7 @@ export default function Chat() {
             Built using <a style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
           </Typography>
           <Typography paragraph>
-          ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals.
+          ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals. 
           <br></br>
           <br></br>
           Pick a candidate below. List updated as of 10/2/2023. 
