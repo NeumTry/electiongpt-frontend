@@ -1,6 +1,8 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
+import Script from 'next/script';
+import { clarity } from 'react-microsoft-clarity';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,6 +16,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  clarity.init("j527gtblbh");
   return (
     <html lang="en">
       <body className={'chat-container ' + inter.className}>

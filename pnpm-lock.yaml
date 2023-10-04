@@ -86,6 +86,9 @@ dependencies:
   react-markdown:
     specifier: ^9.0.0
     version: 9.0.0(@types/react@18.2.8)(react@18.2.0)
+  react-microsoft-clarity:
+    specifier: ^1.2.0
+    version: 1.2.0
   react-syntax-highlighter:
     specifier: ^15.5.0
     version: 15.5.0(react@18.2.0)
@@ -4729,6 +4732,10 @@ packages:
       vfile: 6.0.1
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /react-microsoft-clarity@1.2.0:
+    resolution: {integrity: sha512-a1bsJR1uN1daWq3cBc7NheEGPXrotMRE0oFeRio7kXvHawzQfqu5iX9BoYFF9zRUL0dn+Mz57h1fNlcv3pqXEg==}
     dev: false
 
   /react-remove-scroll-bar@2.3.4(@types/react@18.2.8)(react@18.2.0):
