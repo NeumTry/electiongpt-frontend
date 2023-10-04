@@ -167,7 +167,7 @@ export default function Chat() {
           <br></br>
           </Typography>
           <Typography variant="h6" gutterBottom>
-            List of candidates
+            Choose a candidates
         </Typography>
           <Accordion>
             <AccordionSummary
@@ -244,7 +244,9 @@ export default function Chat() {
     <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Choose a candidate in the menu" : "Chat about " + candidateChosen.name } 
+          {candidateChosen.name == "" ? "Select a candidate to start chatting" : "Chat about " + candidateChosen.name } 
+          <br/>
+          {candidateChosen.name == "" && <Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button>}
         </Typography>
         <div className="message-container px-20" style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0

@@ -21,7 +21,6 @@ export async function POST(req: Request) {
     
   if(messages.length == 0) 
     lastMessage = messages[0]
-
   const url = `https://api.neum.ai/v1/pipelines/${candidatePipeline}/search`;
   const headers = {
     'neum-api-key': process.env.NEUM_API_KEY  || '',
@@ -40,7 +39,6 @@ export async function POST(req: Request) {
       headers:headers,
       body:JSON.stringify(payload)
     });
-
     if (!neumResponse.ok) {
       throw new Error(`HTTP error! status: ${neumResponse.status} - Error: ${JSON.stringify(neumResponse)}`);
     }
@@ -62,7 +60,7 @@ export async function POST(req: Request) {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: [...prompt, ...messages.filter((message:any) => message.role === 'user')],
+      messages: [...prompt, ...messages],
     });
   
     // Convert the response into a friendly text-stream
@@ -73,5 +71,7 @@ export async function POST(req: Request) {
   } catch (error) {
     // Handle errors here
     console.error(error);
+    console.log("here")
+    console.log(error)
   }
 }
