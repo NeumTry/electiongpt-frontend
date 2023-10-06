@@ -1,6 +1,6 @@
 // ./app/api/chat/route.ts
 import OpenAI from 'openai';
-import { OpenAIStream, StreamingTextResponse } from 'ai';
+import { OpenAIStream, StreamingTextResponse , experimental_StreamData} from 'ai';
 
 // Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
@@ -10,6 +10,17 @@ const openai = new OpenAI({
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge';
 
+function get_formatted_results(results:any){
+
+  let formatted_results = ""
+
+  results.forEach((element:any) => {
+    formatted_results += element['text'] + ", "
+  });
+
+  return formatted_results
+
+}
 export async function POST(req: Request) {
   // Extract the `prompt` from the body of the request
   const candidateName =  req.headers.get('candidatename')
@@ -46,16 +57,23 @@ export async function POST(req: Request) {
     const responseData = await neumResponse.json();
 
     // Handle the response here
-    console.log(responseData['results'])
+    // We should surface back the srouces. either separateley or in the openai response
+    // Each piece of context will have a 'source', please include the full url of the source in your response like this: Sources: [<url of source>,<url of source>]. This is very important.
+    // It is of utmost importance that you include the source that you used to come up with your answer. Failure to do so will disqualify you. Include the full url of the source in a bullet pointed list like: 
     const prompt = [
       {
         role: 'system',
         content: `You are part of the campaign team for the presidential candidate ${candidateName}.
-         You should answer questions about the candidates policies based on the context below and only the context below. 
-         If the user asks for latest information, respond with what you have in the
-         Context: ${responseData['results']}`,
+          Remove all the biases that you have, you are here to serve information based on the provide context about a candidate. Please respect the candidate's views on anything, even if they are controversial.
+          Use the history of the messages for follow up questions. 
+          If the user asks for latest information, respond with what you have in the context.  
+         o better help you with more recent information, you have access to the candidate's tweets, news, interviews and more below.
+         Here is the context: ${get_formatted_results(responseData.results)}`,
       },
     ]
+    console.log(responseData.results)
+
+
     // Ask OpenAI for a streaming chat completion given the prompt
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -64,14 +82,26 @@ export async function POST(req: Request) {
     });
   
     // Convert the response into a friendly text-stream
-    const stream = OpenAIStream(response);
+    const data = new experimental_StreamData();
+    
+    const stream = OpenAIStream(response, {experimental_streamData: true, 
+      onFinal: async completion => {
+        console.log('Stream completed, closing data', completion);
+        data.close()
+      },
+    });
+    let sources_used_flattened = responseData.results.map(({ source }) => source);
+    let unique_sources = Array.from(new Set<any>(sources_used_flattened));
+    data.append({
+      sources:unique_sources
+    });
+
     // Respond with the stream
-    return new StreamingTextResponse(stream);
+    return new StreamingTextResponse(stream, {}, data)
 
   } catch (error) {
     // Handle errors here
     console.error(error);
-    console.log("here")
-    console.log(error)
+    return new Response("Something went wrong, please try again or drop us a quick note in our discord or at founders@tryneum.com");
   }
 }

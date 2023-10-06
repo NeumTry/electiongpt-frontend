@@ -21,50 +21,54 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useRef, useEffect } from 'react';
 import { ChatMessage } from '@/components/chat-message';
 import va from '@vercel/analytics';
+import { clarity } from 'react-microsoft-clarity';
 
-// //  NOTEs: 
-// add picture of the candidate instead of the AI - can we?
-// memory for bot
-// deploy
-// analytics
-// Scrolling of the Chat, need to create a component and make it scrollable so that it doens't go to the bottom of the page
-
-// sign in usage? supa?
-
-
+// New pipelines as of 10/6
 export default function Chat() {
   const republicanCandidates = [
-    {'name': 'Donald Trump', 'pipeline_id': 'a6da436b-b1ca-455f-8585-9284272c5ea2','party':'republican'},
-    {'name': 'Ron DeSantis', 'pipeline_id': 'e6f463bb-f740-4bc6-89c3-51c0c7547b77','party':'republican'},
-    {'name': 'Chris Christie', 'pipeline_id': 'a9a90214-429b-4feb-a1f1-2f02f26c5946','party':'republican'},
-    {'name': 'Doug Burgum', 'pipeline_id': '70a8576a-9e15-4564-a04a-3e5ddb69ff6f','party':'republican'},
-    {'name': 'Vivek Ramaswamy', 'pipeline_id': 'bf77b928-6abb-468b-83a0-a1b33a9e816e','party':'republican'},
-    {'name': 'Asa Hutchinson', 'pipeline_id': '85e752c1-be10-4eb3-a704-0f6d9539fca9','party':'republican'},
-    {'name': 'Tim Scott', 'pipeline_id': '7f904d33-a020-4428-a7da-ab73258be90c','party':'republican'},
-    {'name': 'Corey Stapleton', 'pipeline_id': '486c96e1-9cd5-44da-babb-3d78900c505d','party':'republican'},
-    {'name': 'Mike Pence', 'pipeline_id': '2db577a6-4e54-470c-878c-018fc5969559','party':'republican'},
-    {'name': 'Perry Johnson', 'pipeline_id': '310c10c9-095a-4fe4-8619-3ac851504eb4','party':'republican'},
-    {'name': 'Ryan Binkley', 'pipeline_id': '5402bcd4-2192-452b-8850-d348f7086ee0','party':'republican'},
-    {'name': 'Will Hurd', 'pipeline_id': '05a41ac2-892d-4325-b5d6-26e966a7fcb3','party':'republican'},
-    {'name': 'Nikki Haley', 'pipeline_id': '2296e6c0-e997-484e-9d90-d82da1e23d4a','party':'republican'},
-    {'name': 'Larry Elder', 'pipeline_id': '03a89b42-2577-4a77-bd07-2722cb065b3b', 'party':'republican'},
+    {'name': 'Ryan Binkley', 'pipeline_id': '1a2b7503-08b2-4a32-90e0-ba4cc3a33499','party':'republican'},
+    {'name': 'Doug Burgum', 'pipeline_id': 'e3d53062-41b7-4f0b-8966-be5cfe1c90ed','party':'republican'},
+    {'name': 'Chris Christie', 'pipeline_id': '43b23881-ebc7-4faa-9671-25c3be1b4522','party':'republican'},
+    {'name': 'Ron DeSantis', 'pipeline_id': 'ba9ffc9c-47c0-4e40-ba9f-cafee3f3afbb','party':'republican'},
+    {'name': 'Larry Elder', 'pipeline_id': '9bdc83ad-7b99-404c-886d-bd0f0ffab973', 'party':'republican'},
+    {'name': 'Nikki Haley', 'pipeline_id': '76c70a2d-4237-4271-9f46-7ff572fcc28b','party':'republican'},
+    {'name': 'Will Hurd', 'pipeline_id': '4fec3803-b539-44bb-ae62-715f0aa59957','party':'republican'},
+    {'name': 'Asa Hutchinson', 'pipeline_id': '9e6fbe35-b650-4aaf-bb39-ed34aa5b1a4e','party':'republican'},
+    {'name': 'Perry Johnson', 'pipeline_id': 'fd827a7f-640c-4641-b402-3b9e92d87ace','party':'republican'},
+    {'name': 'Mike Pence', 'pipeline_id': '3219ff3d-48d5-4265-81b9-775de156f273','party':'republican'},
+    {'name': 'Vivek Ramaswamy', 'pipeline_id': '4cbc1061-9ce1-45c2-8718-01b2a1b179e1','party':'republican'}, // try this new one: fue shabat no logre test - 433cbbec-2409-450b-a2e3-57187b45607a
+    {'name': 'Tim Scott', 'pipeline_id': '1b25d129-402f-488b-a894-a0ef6353e3e0','party':'republican'},
+    {'name': 'Corey Stapleton', 'pipeline_id': '1416885a-6cc4-4f0b-88f7-1d14d49e717c','party':'republican'},
+    {'name': 'Donald Trump', 'pipeline_id': '252aced6-ac42-41bf-b55e-42db4131404a','party':'republican'},
 ]
+
+// todo
   const democraticCandidates = [
-    {'name': 'Joe Biden', 'pipeline_id': '5eb223c6-f653-46f0-aa4b-149601078492', 'party':'democratic'},
-    {'name': 'Marianne Williamson', 'pipeline_id': '8b5a70b4-5d32-4aec-9865-90f047e1d762', 'party':'democratic'},
-    {'name': 'Robert F Kennedy', 'pipeline_id': 'e65f7d7f-d679-4dd5-8a7c-97be110e54b4', 'party':'democratic'},
+    {'name': 'Joe Biden', 'pipeline_id': 'fd4fade4-20cf-4c24-a811-2292daa6152f', 'party':'democratic'},
+    {'name': 'Robert F Kennedy', 'pipeline_id': 'a86d3486-a693-4370-8eda-bbe5efc3bb7e', 'party':'democratic'},
+    {'name': 'Marianne Williamson', 'pipeline_id': 'cf0127f0-40ed-4cee-8d4f-41d7ef06dc1c', 'party':'democratic'},
   ]
 
   const matches = useMediaQuery('(min-width:960px)');
   const [sidebarOpen, setSidebarOpen] = useState(matches);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [candidateInPreview, setCandidateInPreview] = useState({'name':'','pipeline_id':'', 'party':''})
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
-  const { messages, input, handleInputChange, handleSubmit, data } = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [sourcesCopy, setSourcesCopy] = useState({});
+  const [debateModeClicked, setDebateModeClicked] = useState(false);
   const chatContainerRef = useRef<any>({});
 
   const DrawerHeader = styled('div')(({ theme }:any) => ({
@@ -89,14 +93,21 @@ export default function Chat() {
 
   const handleCandidateChosenClick = (candidate:any) => () => {
     va.track("Clicked Candidate button",{candidate_name:candidate.name})
+    
+    // Display alert saying that the conv history will get deleted if they change.. prompting to sign up.
+    if(candidateChosen.name != ""){
+      setOpenModal(true)
+      setCandidateInPreview(candidate)
+      return
+    }
     setCandidateChosen(candidate)
+    setSidebarOpen(false); // on mobile, set it to false if candidate is chosen so we return to the main chat panel
   };
 
   const handleSubmitForm = (e:any) => {
     if(candidateChosen.name === ""){
-      console.log("please choose a candidate!")
       setSnackbarOpen(true);
-
+      setInput("")
       e.preventDefault()
     }
     else{
@@ -107,6 +118,19 @@ export default function Chat() {
 
   const handleDrawerClose = () => {
     setSidebarOpen(false);
+  };
+
+  const handleChangeCandidateModalClick = () => {
+    setOpenModal(false);
+    setCandidateChosen(candidateInPreview)
+    setSidebarOpen(false)
+    // Clear chat history
+    setMessages([])
+  };
+
+  const handleCancelModal = () => {
+    setSidebarOpen(false)
+    setOpenModal(false);
   };
 
   const handleAboutClose = () => {
@@ -120,18 +144,86 @@ export default function Chat() {
     setSnackbarOpen(false);
   };
   
+  useEffect(() =>{
+    clarity.init("j527gtblbh");
+  },[])
+
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // useEffect(() => {
+  //   if(messages != null && messages.length > 0)
+  //   {
+  //     if(data && data[0] && data[0].sources){
+
+  //       setSourcesCopy(sourcesCopy => ({
+  //         ...sourcesCopy,  // Copy existing dictionary
+  //         [messages[messages.length-1].id]: data[0].sources  // Add new key-value pair
+  //       }));
+        
+  //       console.log(messages)
+  //       console.log(data)
+  //       console.log(sourcesCopy)
+  //     }
+  //   }
+  // }, [messages]);
+
   useEffect(() => {
     setSidebarOpen(matches);
   }, [matches]);
 
+  const styleBoxModal = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
+
+  function display_list_items(data:any, index: any){
+    if(index -2 < 0)
+      index = 0
+    else
+      index = index -2
+    if(data?.length > 0){
+      return data[index].sources.map((elem:any) => (
+        <ListItem key={elem} sx={{ display: 'list-item' }}>
+          - <a className='sourceLinks' style={{textDecoration:"underline"}} href={elem} target ="_"> {elem}</a>
+        </ListItem>
+      ))
+    }
+  }
+
   return (  
     <div>
+      <Modal
+        open={openModal}
+        // onClose={handleModalClose}
+      >
+        <Box sx={styleBoxModal}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Choosing another candidate will clear the current conversation about {candidateChosen.name}. Do you want to continue?
+          </Typography>
+          <Button onClick={handleChangeCandidateModalClick} color="success">
+            Yes
+          </Button>
+          <Button onClick={handleCancelModal} color="error">
+            Cancel
+          </Button>
+          <br></br>
+          <Typography variant="caption" color="gray">
+            <i>If you wish to save the chat history upon changing candidates, sign up here, it's free and takes 5 secs!</i>
+          </Typography>
+        </Box>
+      </Modal>
+
       <header className={`header-background sticky top-0 z-50 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex items-center">
         {!matches && <IconButton onClick={toggleSidebar}>
@@ -143,11 +235,14 @@ export default function Chat() {
       </div>
       <div className="flex items-center justify-end space-x-2">
         <Button className="header-button" onClick={toggleAbout}>About</Button>
+        <Button href='https://discord.gg/mJeNZYRz4m' target='_' className="header-button">Discord</Button>
       </div>
     </header>      
     <Drawer anchor="left" open={sidebarOpen} variant={matches ? 'permanent' : 'temporary'}>
       <div style={{width:400, paddingLeft:20, paddingRight:20}}>
-        <DrawerHeader>
+        <DrawerHeader className="header-flex">
+          <Button>icon</Button>
+          <Button>Saved chats</Button>
           {!matches && <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>}
@@ -159,7 +254,7 @@ export default function Chat() {
             Built using <a onClick={() => {va.track("Clicked 'on top of neum' link")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a>
           </Typography>
           <Typography paragraph>
-          ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candiddates proposals. 
+          ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candidates proposals and other information about them. 
           <br></br>
           <br></br>
           Pick a candidate below. List updated as of 10/2/2023. 
@@ -167,7 +262,7 @@ export default function Chat() {
           <br></br>
           </Typography>
           <Typography variant="h6" gutterBottom>
-            Choose a candidates
+            Choose a candidate
         </Typography>
           <Accordion>
             <AccordionSummary
@@ -178,16 +273,18 @@ export default function Chat() {
               <Typography>Republican Candidates</Typography>
             </AccordionSummary>
           <AccordionDetails > 
+          <Grid container spacing={2}>
             {republicanCandidates.map( candidate =>
-            <div key={candidate.name}>
+            <div key={candidate.name} style={{paddingLeft:'5px', paddingRight:'5px'}}>
               <Button variant="outlined" color="error" onClick={handleCandidateChosenClick(candidate)}>
-              {candidate.name}
-            </Button>
+                {candidate.name}
+              </Button>
             <br></br>
             <br></br>
             </div>
             )}
             {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
+            </Grid>
           </AccordionDetails>
         </Accordion>
         <br></br>
@@ -201,8 +298,9 @@ export default function Chat() {
               <Typography>Democrat Candidates</Typography>
             </AccordionSummary>
             <AccordionDetails>
+            <Grid container spacing={2}>
             {democraticCandidates.map( candidate =>
-              <div key={candidate.name}>
+              <div key={candidate.name} style={{paddingLeft:'5px', paddingRight:'5px'}}>
                 <Button variant="outlined" onClick={handleCandidateChosenClick(candidate)}>
                 {candidate.name}
               </Button>
@@ -210,8 +308,13 @@ export default function Chat() {
               <br></br>
               </div>
               )}
+            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
+            </Grid>
             </AccordionDetails>
           </Accordion>
+          <br></br>
+          <Button onClick={() => {setDebateModeClicked(true);va.track("DebateMode clicked")}}>Debate mode</Button>
+          {debateModeClicked && <Typography variant="caption">Coming soon!</Typography>}
         </div>
       </Drawer>
     <Drawer anchor='right' open={aboutOpen} variant='temporary'>
@@ -225,7 +328,7 @@ export default function Chat() {
             About
           </Typography>
           <Typography paragraph>
-            ElectionGPT is continously updated with data for the candidates from a variety of sources. The goal is to present an unbiased, up to date interface into each candidates government plan. We built ElectionGPT to help us understand the candidates and their perspectives outside of the noisiness of media and news; grounded on their core proposals and beliefs. 
+            ElectionGPT is continuosly updated with data for the candidates from a variety of sources. The goal is to present an unbiased, up to date interface into each candidates government plan. We built ElectionGPT to help us understand the candidates and their perspectives outside of the noisiness of media and news; grounded on their core proposals and beliefs. 
             <br></br>
             <br></br>
             ElectionGPT pulls from data sources such as:
@@ -246,18 +349,34 @@ export default function Chat() {
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
           {candidateChosen.name == "" ? "Select a candidate to start chatting" : "Chat about " + candidateChosen.name } 
           <br/>
-          {candidateChosen.name == "" && <Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button>}
+          {(candidateChosen.name == "" && !matches) && <Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button>}
         </Typography>
         <div className="message-container px-20" style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0
           ? messages.map((m:any, index:any) => (
               <div key={m.id} className={`message-container ${m.role}`}>
                 <div className="message-content">
-                  <ChatMessage message={m} />
+                  <ChatMessage message={m}/>
                 </div>
-                <br></br>
+                {(m.role !== "user" && data && data[0] && data[0].sources.length > 0) ? (
+                  <Accordion sx={{borderRadius:'10px'}} >
+                    <AccordionSummary className='accordion-sources-color'
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Typography variant="h6">Sources used</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails className='accordion-sources-color'>
+                      <List>
+                      {
+                        display_list_items(data, index)
+                      }
+                      </List>
+                    </AccordionDetails>
+                  </Accordion>
+                ) : null}
                 {index !== messages.length - 1 && <div className="divider" />}
-
               </div>
             ))
           : null}
@@ -278,7 +397,7 @@ export default function Chat() {
           <button type="submit" className={`${candidateChosen.party == "" ? "submission-button-color-standard" : `submission-button-color-${candidateChosen.party}`} submission-button`}>Send</button>
         </form>
       </div>
-      </div>
+     </div>
     </div>
   </div>
   );

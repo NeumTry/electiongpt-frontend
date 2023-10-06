@@ -7,7 +7,7 @@
 }
 
 .stretch {
-  max-width: 800px; /* Adjust the value to expand the chat area */
+  max-width: 900px; /* Adjust the value to expand the chat area */
 }
 
 .message-container {
@@ -17,6 +17,9 @@
   width: 0; /* This will hide the scrollbar on WebKit browsers (e.g., Chrome, Safari) */
 }
 
+.sourceLinks:hover{
+  color: rgb(71, 110, 216); /* Change the color here */
+}
 .message-content {
   display: flex;
   align-items: center;
@@ -37,6 +40,12 @@
 
 .ai.icon {
   color: #4caf50;
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .divider {
@@ -60,6 +69,17 @@
   color: #2e2e2e;
 }
 
+.bottom-form {
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  justify-content: center;
+}
+
+
 .submission-input {
   flex-grow: 1;
   padding: 8px;
@@ -68,6 +88,8 @@
   font-size: 16px;
   width: 100%;
 }
+
+
 
 .submission-button-color-republican{
   background-color: #bd0b0b;
@@ -114,6 +136,10 @@
 
 .chat-container {
   background-color: #2e2e2e; /* Add your preferred shade of grey here */
+}
+
+.accordion-sources-color {
+  background-color: #a7a4a4; /* Add your preferred shade of grey here */
 }
 
 .header-background {
