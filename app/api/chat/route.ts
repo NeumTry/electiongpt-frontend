@@ -90,7 +90,7 @@ export async function POST(req: Request) {
         data.close()
       },
     });
-    let sources_used_flattened = responseData.results.map(({ source }) => source);
+    let sources_used_flattened = responseData.results.map(({ source }:any) => source);
     let unique_sources = Array.from(new Set<any>(sources_used_flattened));
     data.append({
       sources:unique_sources

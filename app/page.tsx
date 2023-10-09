@@ -1,6 +1,6 @@
 'use client';
 import '../css/class-styles.css';
-
+import Link from 'next/link'
 import { useChat } from 'ai/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons'
@@ -16,6 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import { styled, useTheme } from '@mui/material/styles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import PersonIcon from '@mui/icons-material/Person';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -32,9 +33,14 @@ import { useRef, useEffect } from 'react';
 import { ChatMessage } from '@/components/chat-message';
 import va from '@vercel/analytics';
 import { clarity } from 'react-microsoft-clarity';
+import { SignUp } from "@clerk/nextjs";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
+import { useRouter } from 'next/navigation'
 
 // New pipelines as of 10/6
 export default function Chat() {
+  const router = useRouter()
   const republicanCandidates = [
     {'name': 'Ryan Binkley', 'pipeline_id': '1a2b7503-08b2-4a32-90e0-ba4cc3a33499','party':'republican'},
     {'name': 'Doug Burgum', 'pipeline_id': 'e3d53062-41b7-4f0b-8966-be5cfe1c90ed','party':'republican'},
@@ -46,7 +52,7 @@ export default function Chat() {
     {'name': 'Asa Hutchinson', 'pipeline_id': '9e6fbe35-b650-4aaf-bb39-ed34aa5b1a4e','party':'republican'},
     {'name': 'Perry Johnson', 'pipeline_id': 'fd827a7f-640c-4641-b402-3b9e92d87ace','party':'republican'},
     {'name': 'Mike Pence', 'pipeline_id': '3219ff3d-48d5-4265-81b9-775de156f273','party':'republican'},
-    {'name': 'Vivek Ramaswamy', 'pipeline_id': '4cbc1061-9ce1-45c2-8718-01b2a1b179e1','party':'republican'}, // try this new one: fue shabat no logre test - 433cbbec-2409-450b-a2e3-57187b45607a
+    {'name': 'Vivek Ramaswamy', 'pipeline_id': 'd3ab4948-0481-45f0-9f52-534e1809515e','party':'republican'}, // try this new one: fue shabat no logre test - d3ab4948-0481-45f0-9f52-534e1809515e
     {'name': 'Tim Scott', 'pipeline_id': '1b25d129-402f-488b-a894-a0ef6353e3e0','party':'republican'},
     {'name': 'Corey Stapleton', 'pipeline_id': '1416885a-6cc4-4f0b-88f7-1d14d49e717c','party':'republican'},
     {'name': 'Donald Trump', 'pipeline_id': '252aced6-ac42-41bf-b55e-42db4131404a','party':'republican'},
@@ -67,8 +73,11 @@ export default function Chat() {
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
   const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [sourcesCopy, setSourcesCopy] = useState({});
   const [debateModeClicked, setDebateModeClicked] = useState(false);
+  const [signupClicked, setSignupClicked] = useState(false);
+  const [userModal, setUserModal] = useState(false);
+  const [showCandidatesDrawer, setShowCandidatesDrawer] = useState(true);
+
   const chatContainerRef = useRef<any>({});
 
   const DrawerHeader = styled('div')(({ theme }:any) => ({
@@ -90,6 +99,11 @@ export default function Chat() {
     va.track("About button clicked")
     setAboutOpen(true);
   };
+
+  const handleShowCandidatesDrawer = (isShowCandidates:boolean) => () => {
+    setShowCandidatesDrawer(isShowCandidates);
+  };
+
 
   const handleCandidateChosenClick = (candidate:any) => () => {
     va.track("Clicked Candidate button",{candidate_name:candidate.name})
@@ -118,6 +132,10 @@ export default function Chat() {
 
   const handleDrawerClose = () => {
     setSidebarOpen(false);
+  };
+
+  const handleSignUp = () => {
+    setSignupClicked(true);
   };
 
   const handleChangeCandidateModalClick = () => {
@@ -154,22 +172,7 @@ export default function Chat() {
     }
   }, [messages]);
 
-  // useEffect(() => {
-  //   if(messages != null && messages.length > 0)
-  //   {
-  //     if(data && data[0] && data[0].sources){
-
-  //       setSourcesCopy(sourcesCopy => ({
-  //         ...sourcesCopy,  // Copy existing dictionary
-  //         [messages[messages.length-1].id]: data[0].sources  // Add new key-value pair
-  //       }));
-        
-  //       console.log(messages)
-  //       console.log(data)
-  //       console.log(sourcesCopy)
-  //     }
-  //   }
-  // }, [messages]);
+  const { user } = useClerk();
 
   useEffect(() => {
     setSidebarOpen(matches);
@@ -201,8 +204,25 @@ export default function Chat() {
     }
   }
 
+  const handleClose = () => {
+    setUserModal(false)
+}
   return (  
     <div>
+      <Modal onClose={handleClose} open={userModal}>
+        <Box sx={styleBoxModal}>
+          <Typography variant="h4">
+           Hi,{user?.fullName}!
+          </Typography>
+          <br></br>
+          <Typography variant="subtitle1">
+            You will be able to configure your profile soon!
+          </Typography>
+          <Typography variant="caption" color={"gray"}>
+            Sign out <Link style={{textDecoration:"underline"}} href="signout">here</Link>
+          </Typography>
+        </Box>
+      </Modal>
       <Modal
         open={openModal}
         // onClose={handleModalClose}
@@ -219,7 +239,7 @@ export default function Chat() {
           </Button>
           <br></br>
           <Typography variant="caption" color="gray">
-            <i>If you wish to save the chat history upon changing candidates, sign up here, it's free and takes 5 secs!</i>
+            <i>If you wish to save the chat history upon changing candidates, sign up <Link style={{textDecoration:"underline"}} href="/signup">here</Link>, it's free and takes 5 secs!</i>
           </Typography>
         </Box>
       </Modal>
@@ -234,6 +254,7 @@ export default function Chat() {
         🗳️ ElectionGPT
       </div>
       <div className="flex items-center justify-end space-x-2">
+        <UserButton afterSignOutUrl="/"/>
         <Button className="header-button" onClick={toggleAbout}>About</Button>
         <Button href='https://discord.gg/mJeNZYRz4m' target='_' className="header-button">Discord</Button>
       </div>
@@ -241,12 +262,13 @@ export default function Chat() {
     <Drawer anchor="left" open={sidebarOpen} variant={matches ? 'permanent' : 'temporary'}>
       <div style={{width:400, paddingLeft:20, paddingRight:20}}>
         <DrawerHeader className="header-flex">
-          <Button>icon</Button>
-          <Button>Saved chats</Button>
+          <Button onClick={handleShowCandidatesDrawer(true)}>Candidates</Button>
+          <Button onClick={handleShowCandidatesDrawer(false)}>Saved chats</Button>
           {!matches && <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>}
         </DrawerHeader>
+        {showCandidatesDrawer && ( <>
         <Typography variant="h4" gutterBottom>
         🗳️ ElectionGPT
         </Typography>
@@ -315,6 +337,27 @@ export default function Chat() {
           <br></br>
           <Button onClick={() => {setDebateModeClicked(true);va.track("DebateMode clicked")}}>Debate mode</Button>
           {debateModeClicked && <Typography variant="caption">Coming soon!</Typography>}
+          </>)}
+          {!showCandidatesDrawer && (
+            <>
+            {
+              user == null? 
+                <> 
+                  <div className='centered-div'>
+                    <Typography variant="h6">You need to sign up to be able to save chats!</Typography>
+                    <br></br>
+                    <Typography variant="caption">It's free and takes 10 seconds! Otherwise, feel free to chat without saving the history of the messages!</Typography>
+                    <br></br>
+                    <br></br>
+                    <Button onClick={() => router.push('/signup')} variant="outlined">Sign up now</Button>
+                  </div></>
+              : <>
+                  <div>
+                    <Typography variant="h4">Saved chats</Typography>
+                  </div>
+                </>}
+              </>
+          )}
         </div>
       </Drawer>
     <Drawer anchor='right' open={aboutOpen} variant='temporary'>

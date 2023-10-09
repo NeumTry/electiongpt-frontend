@@ -154,3 +154,11 @@
   color: #2196F3;
   font-weight: 500;
 }
+
+.centered-div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
