@@ -33,10 +33,13 @@ import { useRef, useEffect } from 'react';
 import { ChatMessage } from '@/components/chat-message';
 import va from '@vercel/analytics';
 import { clarity } from 'react-microsoft-clarity';
-import { SignUp } from "@clerk/nextjs";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation'
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Textarea from '@mui/joy/Textarea';
+import { SocialIcon } from 'react-social-icons'
 
 // New pipelines as of 10/6
 export default function Chat() {
@@ -72,11 +75,14 @@ export default function Chat() {
   const [candidateInPreview, setCandidateInPreview] = useState({'name':'','pipeline_id':'', 'party':''})
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
   const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState({'state':false,'message':""});
+  const [successSnackbarFeedback, setSuccessSnackbarFeedback] = useState(false);
   const [debateModeClicked, setDebateModeClicked] = useState(false);
   const [signupClicked, setSignupClicked] = useState(false);
   const [userModal, setUserModal] = useState(false);
-  const [showCandidatesDrawer, setShowCandidatesDrawer] = useState(true);
+  const [tabValue, setTabValue] = useState(0);
+  const [feedbackModal, setFeedbackModal] = useState(false);
+  const [feedbackInput, setFeedbackInput] = useState('');
 
   const chatContainerRef = useRef<any>({});
 
@@ -89,6 +95,10 @@ export default function Chat() {
     justifyContent: 'flex-end',
   }));
 
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   const theme = useTheme();
 
   const toggleSidebar = () => {
@@ -99,11 +109,6 @@ export default function Chat() {
     va.track("About button clicked")
     setAboutOpen(true);
   };
-
-  const handleShowCandidatesDrawer = (isShowCandidates:boolean) => () => {
-    setShowCandidatesDrawer(isShowCandidates);
-  };
-
 
   const handleCandidateChosenClick = (candidate:any) => () => {
     va.track("Clicked Candidate button",{candidate_name:candidate.name})
@@ -120,7 +125,7 @@ export default function Chat() {
 
   const handleSubmitForm = (e:any) => {
     if(candidateChosen.name === ""){
-      setSnackbarOpen(true);
+      setSnackbarOpen({'state':true,'message':"Please choose a candidate before sending a message!"});
       setInput("")
       e.preventDefault()
     }
@@ -134,9 +139,14 @@ export default function Chat() {
     setSidebarOpen(false);
   };
 
-  const handleSignUp = () => {
-    setSignupClicked(true);
+  const handleFeedbackButton = () => {
+    setFeedbackModal(true);
   };
+
+  const handleFeedbackButtonClose = () => {
+    setFeedbackModal(false);
+  };
+
 
   const handleChangeCandidateModalClick = () => {
     setOpenModal(false);
@@ -155,11 +165,48 @@ export default function Chat() {
     setAboutOpen(false);
   };
 
+
+  const handleFeedbackTextAreaChange = (event: any) => {
+    setFeedbackInput(event.target.value)
+  };
+
+
+  const submitFeedbackForm = async () => {
+    // send request to mongo, display success, clear textarea
+    if(feedbackInput === ""){
+      setSnackbarOpen({'state':true,'message':"Please write some feedback first!"});
+    }
+    else{
+      try {
+        const response = await fetch('/api/feedback', { 
+          method:'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body:JSON.stringify({ feedback: feedbackInput })
+        });
+        setSuccessSnackbarFeedback(true)
+      } catch (error) {
+        setSnackbarOpen({'state':true,'message':"There was an error submitting feedback! Sorry about this, pleas email kevin@tryneum.com if you don't mind!"});
+      }
+      // send to db
+
+    }
+  };
+
+  const handleSnackbarFeedbackClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSuccessSnackbarFeedback(false);
+  };
+
+
   const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    setSnackbarOpen(false);
+    setSnackbarOpen({'state':false,'message':""});
   };
   
   useEffect(() =>{
@@ -195,8 +242,8 @@ export default function Chat() {
       index = 0
     else
       index = index -2
-    if(data?.length > 0){
-      return data[index].sources.map((elem:any) => (
+    if(data?.length > 0 ){
+      return data[index]?.sources?.map((elem:any) => (
         <ListItem key={elem} sx={{ display: 'list-item' }}>
           - <a className='sourceLinks' style={{textDecoration:"underline"}} href={elem} target ="_"> {elem}</a>
         </ListItem>
@@ -221,6 +268,25 @@ export default function Chat() {
           <Typography variant="caption" color={"gray"}>
             Sign out <Link style={{textDecoration:"underline"}} href="signout">here</Link>
           </Typography>
+        </Box>
+      </Modal>
+      <Modal onClose={handleFeedbackButtonClose} open={feedbackModal}>
+        <Box sx={styleBoxModal}>
+          <Typography variant="h5">
+           Thanks for providing feedback!
+          </Typography>
+          <br></br>
+          <Textarea
+            color="neutral"
+            disabled={false}
+            minRows={2}
+            placeholder="All feedback is welcomed!"
+            size="lg"
+            variant="outlined"
+            onChange={handleFeedbackTextAreaChange}
+          />
+          <br></br>
+          <Button onClick={submitFeedbackForm} variant="outlined">Submit</Button>
         </Box>
       </Modal>
       <Modal
@@ -250,25 +316,27 @@ export default function Chat() {
           <MenuIcon className='white-icon'/>
         </IconButton>}
       </div>
-      <div className="flex items-center text-[#e0e0e0]">
+      {matches && <Typography className="flex items-center text-[#e0e0e0]" >
         🗳️ ElectionGPT
-      </div>
+        </Typography>}
       <div className="flex items-center justify-end space-x-2">
         <UserButton afterSignOutUrl="/"/>
         <Button className="header-button" onClick={toggleAbout}>About</Button>
-        <Button href='https://discord.gg/mJeNZYRz4m' target='_' className="header-button">Discord</Button>
+        <Button onClick={handleFeedbackButton} className="header-button">Feedback</Button>
       </div>
     </header>      
     <Drawer anchor="left" open={sidebarOpen} variant={matches ? 'permanent' : 'temporary'}>
       <div style={{width:400, paddingLeft:20, paddingRight:20}}>
         <DrawerHeader className="header-flex">
-          <Button onClick={handleShowCandidatesDrawer(true)}>Candidates</Button>
-          <Button onClick={handleShowCandidatesDrawer(false)}>Saved chats</Button>
+        <Tabs onChange={handleTabChange} value={tabValue}>
+          <Tab label="Candidates" />
+          <Tab label="Saved Chats"  />
+        </Tabs>
           {!matches && <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>}
         </DrawerHeader>
-        {showCandidatesDrawer && ( <>
+        {(tabValue == 0) && ( <>
         <Typography variant="h4" gutterBottom>
         🗳️ ElectionGPT
         </Typography>
@@ -338,7 +406,7 @@ export default function Chat() {
           <Button onClick={() => {setDebateModeClicked(true);va.track("DebateMode clicked")}}>Debate mode</Button>
           {debateModeClicked && <Typography variant="caption">Coming soon!</Typography>}
           </>)}
-          {!showCandidatesDrawer && (
+          {((tabValue == 1)) && (
             <>
             {
               user == null? 
@@ -361,7 +429,7 @@ export default function Chat() {
         </div>
       </Drawer>
     <Drawer anchor='right' open={aboutOpen} variant='temporary'>
-      <div style={{width:400, paddingLeft:20, paddingRight:20}}>
+      <div style={{width:400, paddingLeft:'10%', paddingRight:'10%'}}>
         <DrawerHeader>
           <IconButton onClick={handleAboutClose}>
             <CloseIcon/>
@@ -384,6 +452,16 @@ export default function Chat() {
             <br></br>
             <br></br>
             Behind the scenes, ElectionGPT is built on top of <a onClick={() => {va.track("Clicked 'on top of neum' link in About")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a onClick={() => {va.track("Clicked 'Weaviate' link")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
+            <br></br>
+            <br></br>
+            Follow us!
+            <br></br>
+            <br></br>
+            <SocialIcon url="https://x.com/neum_ai" target="_" bgColor="#2e2e2e" /><span style={{color:"white"}}>-</span>
+            <SocialIcon url="https://www.linkedin.com/company/neumai/" bgColor="#2e2e2e" target="_"/><span style={{color:"white"}}>-</span>
+            <SocialIcon url="https://discord.gg/mJeNZYRz4m" bgColor="#2e2e2e" target="_" /><span style={{color:"white"}}>-</span>
+            <SocialIcon url="https://medium.com/@neum_ai/retrieval-augmented-generation-at-scale-building-a-distributed-system-for-synchronizing-and-eaa29162521" bgColor="#2e2e2e" target="_" /><span style={{color:"white"}}>-</span>
+            <SocialIcon url="https://www.youtube.com/@NeumAI" bgColor="#2e2e2e" target="_" /> 
           </Typography>
         </div>
     </Drawer>
@@ -424,9 +502,14 @@ export default function Chat() {
             ))
           : null}
         </div>
-      <Snackbar anchorOrigin={{ vertical:'top', horizontal:'center' }} open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+      <Snackbar anchorOrigin={{ vertical:'top', horizontal:'center' }} open={snackbarOpen.state} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
-          Please choose a candidate before sending a message!
+          {snackbarOpen.message}
+        </Alert>
+      </Snackbar>
+      <Snackbar anchorOrigin={{ vertical:'top', horizontal:'center' }} open={successSnackbarFeedback} autoHideDuration={2000} onClose={handleSnackbarFeedbackClose}>
+        <Alert onClose={handleSnackbarFeedbackClose} severity="success" sx={{ width: '100%' }}>
+          Feedback submitted!
         </Alert>
       </Snackbar>
       <div className='flex justify-center items-center'>
