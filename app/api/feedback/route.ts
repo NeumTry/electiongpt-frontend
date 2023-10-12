@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 
 export async function POST(req: Request) {
     let res = await req.json()
-    const id: string = uuid();
-    await kv.hset("feedbacks", { id: id, feedback: res.feedback})
+    await kv.sadd(`feedbacks`,res.feedback);
     return NextResponse.json({"success":"yes"});
 }

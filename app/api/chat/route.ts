@@ -1,6 +1,8 @@
 // ./app/api/chat/route.ts
 import OpenAI from 'openai';
 import { OpenAIStream, StreamingTextResponse , experimental_StreamData} from 'ai';
+import { kv } from '@vercel/kv';
+import { v4 as uuid } from 'uuid';
 
 // Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
@@ -28,10 +30,13 @@ export async function POST(req: Request) {
 
   const { messages } = await req.json();
   
-  let lastMessage = messages[messages.length - 1]
-    
+  let lastMessage:any
+
   if(messages.length == 0) 
     lastMessage = messages[0]
+  else
+    lastMessage = messages[messages.length - 1]
+
   const url = `https://api.neum.ai/v1/pipelines/${candidatePipeline}/search`;
   const headers = {
     'neum-api-key': process.env.NEUM_API_KEY  || '',
@@ -71,33 +76,33 @@ export async function POST(req: Request) {
          Here is the context: ${get_formatted_results(responseData.results)}`,
       },
     ]
-    console.log(responseData.results)
-
-
     // Ask OpenAI for a streaming chat completion given the prompt
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       stream: true,
       messages: [...prompt, ...messages],
     });
-  
+    
     // Convert the response into a friendly text-stream
     const data = new experimental_StreamData();
     
     const stream = OpenAIStream(response, {experimental_streamData: true, 
-      onFinal: async completion => {
-        console.log('Stream completed, closing data', completion);
-        data.close()
+      onCompletion(completion) {
+        let sources_used_flattened = responseData.results.map(({ source }:any) => source);
+        let unique_sources = Array.from(new Set<any>(sources_used_flattened));
+        console.log(unique_sources)
+        data.append({
+          // This is a hack and doesn't really work if user selects candidate 1 then candidate 2 then back to candidate 1.....
+            pipeline: candidatePipeline,
+            sources:unique_sources,
+            // timestamp:timestamp
+        });
+        data.close() // should this be here or in oncompletion?
       },
     });
-    let sources_used_flattened = responseData.results.map(({ source }:any) => source);
-    let unique_sources = Array.from(new Set<any>(sources_used_flattened));
-    data.append({
-      sources:unique_sources
-    });
-
+   
     // Respond with the stream
-    return new StreamingTextResponse(stream, {}, data)
+    return new StreamingTextResponse(stream,{}, data)
 
   } catch (error) {
     // Handle errors here

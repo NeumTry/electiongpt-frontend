@@ -1,9 +1,6 @@
 'use client';
 import '../css/class-styles.css';
-import Link from 'next/link'
 import { useChat } from 'ai/react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faRobot } from '@fortawesome/free-solid-svg-icons'
 import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Drawer from '@mui/material/Drawer';
@@ -16,7 +13,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import { styled, useTheme } from '@mui/material/styles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import PersonIcon from '@mui/icons-material/Person';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -33,17 +29,14 @@ import { useRef, useEffect } from 'react';
 import { ChatMessage } from '@/components/chat-message';
 import va from '@vercel/analytics';
 import { clarity } from 'react-microsoft-clarity';
-import { useClerk } from "@clerk/nextjs";
-import { UserButton } from "@clerk/nextjs";
-import { useRouter } from 'next/navigation'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Textarea from '@mui/joy/Textarea';
 import { SocialIcon } from 'react-social-icons'
+import Input from '@mui/material/Input';
 
 // New pipelines as of 10/6
 export default function Chat() {
-  const router = useRouter()
   const republicanCandidates = [
     {'name': 'Ryan Binkley', 'pipeline_id': '1a2b7503-08b2-4a32-90e0-ba4cc3a33499','party':'republican'},
     {'name': 'Doug Burgum', 'pipeline_id': 'e3d53062-41b7-4f0b-8966-be5cfe1c90ed','party':'republican'},
@@ -67,7 +60,7 @@ export default function Chat() {
     {'name': 'Robert F Kennedy', 'pipeline_id': 'a86d3486-a693-4370-8eda-bbe5efc3bb7e', 'party':'democratic'},
     {'name': 'Marianne Williamson', 'pipeline_id': 'cf0127f0-40ed-4cee-8d4f-41d7ef06dc1c', 'party':'democratic'},
   ]
-
+  // const { user } = useClerk();
   const matches = useMediaQuery('(min-width:960px)');
   const [sidebarOpen, setSidebarOpen] = useState(matches);
   const [aboutOpen, setAboutOpen] = useState(false);
@@ -78,11 +71,10 @@ export default function Chat() {
   const [snackbarOpen, setSnackbarOpen] = useState({'state':false,'message':""});
   const [successSnackbarFeedback, setSuccessSnackbarFeedback] = useState(false);
   const [debateModeClicked, setDebateModeClicked] = useState(false);
-  const [signupClicked, setSignupClicked] = useState(false);
-  const [userModal, setUserModal] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [feedbackModal, setFeedbackModal] = useState(false);
   const [feedbackInput, setFeedbackInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
 
   const chatContainerRef = useRef<any>({});
 
@@ -97,6 +89,9 @@ export default function Chat() {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+    if(newValue === 1){
+      va.track("Saved chats tab clicked")
+    }
   };
 
   const theme = useTheme();
@@ -114,7 +109,7 @@ export default function Chat() {
     va.track("Clicked Candidate button",{candidate_name:candidate.name})
     
     // Display alert saying that the conv history will get deleted if they change.. prompting to sign up.
-    if(candidateChosen.name != ""){
+    if(candidateChosen.name != "" && candidateChosen.name !== candidate.name){
       setOpenModal(true)
       setCandidateInPreview(candidate)
       return
@@ -128,6 +123,16 @@ export default function Chat() {
       setSnackbarOpen({'state':true,'message':"Please choose a candidate before sending a message!"});
       setInput("")
       e.preventDefault()
+      return
+    }
+    let arrayForCandidate = data?.filter((item:any) => item.pipeline === candidateChosen.pipeline_id);
+    if( ((!arrayForCandidate || arrayForCandidate.length === 0) && messages.length>0) || (arrayForCandidate && Math.trunc(messages.length/2) > data.length)){
+      setSnackbarOpen({'state':true,'message':"Please wait till the response finishes generating"});
+      e.preventDefault()
+    }
+    else if(input === ""){
+      setSnackbarOpen({'state':true,'message':"Input can't be empty!"});
+      e.preventDefault()
     }
     else{
       va.track("Sent message to chatbot", {candidate_name:candidateChosen.name})
@@ -140,6 +145,7 @@ export default function Chat() {
   };
 
   const handleFeedbackButton = () => {
+    va.track("Clicked Feedback button")
     setFeedbackModal(true);
   };
 
@@ -170,6 +176,9 @@ export default function Chat() {
     setFeedbackInput(event.target.value)
   };
 
+  const handleEmailInput = (event: any) => {
+    setEmailInput(event.target.value)
+  };
 
   const submitFeedbackForm = async () => {
     // send request to mongo, display success, clear textarea
@@ -183,14 +192,14 @@ export default function Chat() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body:JSON.stringify({ feedback: feedbackInput })
+          body:JSON.stringify({ feedback: {feedbackContent:feedbackInput, emailAddress:emailInput} })
         });
         setSuccessSnackbarFeedback(true)
+        setFeedbackModal(false)
+        setEmailInput("")
       } catch (error) {
         setSnackbarOpen({'state':true,'message':"There was an error submitting feedback! Sorry about this, pleas email kevin@tryneum.com if you don't mind!"});
       }
-      // send to db
-
     }
   };
 
@@ -219,8 +228,6 @@ export default function Chat() {
     }
   }, [messages]);
 
-  const { user } = useClerk();
-
   useEffect(() => {
     setSidebarOpen(matches);
   }, [matches]);
@@ -241,35 +248,33 @@ export default function Chat() {
     if(index -2 < 0)
       index = 0
     else
-      index = index -2
+      index = Math.trunc(index / 2)
     if(data?.length > 0 ){
-      return data[index]?.sources?.map((elem:any) => (
+      let arrayForCandidate = data.filter((item:any) => item.pipeline === candidateChosen.pipeline_id);
+      return arrayForCandidate[index]?.sources?.map((elem:any) => (
         <ListItem key={elem} sx={{ display: 'list-item' }}>
-          - <a className='sourceLinks' style={{textDecoration:"underline"}} href={elem} target ="_"> {elem}</a>
+          <Typography noWrap>- <a className="sourceLinks" style={{textDecoration:"underline"}} href={elem} target ="_"> {elem}</a></Typography>
         </ListItem>
       ))
     }
   }
 
-  const handleClose = () => {
-    setUserModal(false)
-}
+  function dataArrayHasCurrentPipeline(data:any, index:number){
+    if(index -2 < 0)
+      index = 0
+    else
+      index = Math.trunc(index / 2)
+    let arrayForCandidate = data.filter((item:any) => item.pipeline === candidateChosen.pipeline_id);
+    if(arrayForCandidate.length > 0){
+      if (arrayForCandidate.length === index)
+        return false
+      return true
+    }
+    return false
+
+  }
   return (  
     <div>
-      <Modal onClose={handleClose} open={userModal}>
-        <Box sx={styleBoxModal}>
-          <Typography variant="h4">
-           Hi,{user?.fullName}!
-          </Typography>
-          <br></br>
-          <Typography variant="subtitle1">
-            You will be able to configure your profile soon!
-          </Typography>
-          <Typography variant="caption" color={"gray"}>
-            Sign out <Link style={{textDecoration:"underline"}} href="signout">here</Link>
-          </Typography>
-        </Box>
-      </Modal>
       <Modal onClose={handleFeedbackButtonClose} open={feedbackModal}>
         <Box sx={styleBoxModal}>
           <Typography variant="h5">
@@ -285,6 +290,9 @@ export default function Chat() {
             variant="outlined"
             onChange={handleFeedbackTextAreaChange}
           />
+          <br></br>
+          <Input value={emailInput} onChange={handleEmailInput} placeholder='youremail@email.com'/>
+          <br></br>
           <br></br>
           <Button onClick={submitFeedbackForm} variant="outlined">Submit</Button>
         </Box>
@@ -304,9 +312,9 @@ export default function Chat() {
             Cancel
           </Button>
           <br></br>
-          <Typography variant="caption" color="gray">
+          {/* <Typography variant="caption" color="gray">
             <i>If you wish to save the chat history upon changing candidates, sign up <Link style={{textDecoration:"underline"}} href="/signup">here</Link>, it's free and takes 5 secs!</i>
-          </Typography>
+          </Typography> */}
         </Box>
       </Modal>
 
@@ -320,7 +328,6 @@ export default function Chat() {
         🗳️ ElectionGPT
         </Typography>}
       <div className="flex items-center justify-end space-x-2">
-        <UserButton afterSignOutUrl="/"/>
         <Button className="header-button" onClick={toggleAbout}>About</Button>
         <Button onClick={handleFeedbackButton} className="header-button">Feedback</Button>
       </div>
@@ -403,28 +410,15 @@ export default function Chat() {
             </AccordionDetails>
           </Accordion>
           <br></br>
-          <Button onClick={() => {setDebateModeClicked(true);va.track("DebateMode clicked")}}>Debate mode</Button>
+          <Button onClick={() => {setDebateModeClicked(true);va.track("Debate Mode clicked")}}>Debate mode</Button>
           {debateModeClicked && <Typography variant="caption">Coming soon!</Typography>}
           </>)}
           {((tabValue == 1)) && (
             <>
-            {
-              user == null? 
-                <> 
                   <div className='centered-div'>
-                    <Typography variant="h6">You need to sign up to be able to save chats!</Typography>
-                    <br></br>
-                    <Typography variant="caption">It's free and takes 10 seconds! Otherwise, feel free to chat without saving the history of the messages!</Typography>
-                    <br></br>
-                    <br></br>
-                    <Button onClick={() => router.push('/signup')} variant="outlined">Sign up now</Button>
-                  </div></>
-              : <>
-                  <div>
-                    <Typography variant="h4">Saved chats</Typography>
+                    <Typography variant="h6">Saved chats feature coming soon!</Typography>
                   </div>
-                </>}
-              </>
+            </>
           )}
         </div>
       </Drawer>
@@ -439,7 +433,7 @@ export default function Chat() {
             About
           </Typography>
           <Typography paragraph>
-            ElectionGPT is continuosly updated with data for the candidates from a variety of sources. The goal is to present an unbiased, up to date interface into each candidates government plan. We built ElectionGPT to help us understand the candidates and their perspectives outside of the noisiness of media and news; grounded on their core proposals and beliefs. 
+            ElectionGPT is continuosly updated with data for the candidates from a variety of sources. The goal is to present an unbiased, up to date interface into each candidates government plan. We built ElectionGPT to help us understand the candidates and their perspectives in an easy-to-consume way. 
             <br></br>
             <br></br>
             ElectionGPT pulls from data sources such as:
@@ -449,7 +443,6 @@ export default function Chat() {
             <li>Published government plans</li>
             <li>Tweets</li>
             <li>Interview transcripts</li>
-            <br></br>
             <br></br>
             Behind the scenes, ElectionGPT is built on top of <a onClick={() => {va.track("Clicked 'on top of neum' link in About")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Neum AI</a> which continously connects data sources into a vector database (<a onClick={() => {va.track("Clicked 'Weaviate' link")}} style={{textDecoration:"underline"}} href='https://neum.ai' target='_'>Weaviate ❤️</a>) where it is accessed at runtime to compose responses. 
             <br></br>
@@ -472,14 +465,14 @@ export default function Chat() {
           <br/>
           {(candidateChosen.name == "" && !matches) && <Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button>}
         </Typography>
-        <div className="message-container px-20" style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
+        <div className={`message-container ${!matches ? 'padding-container' : 'px-20'}`} style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0
           ? messages.map((m:any, index:any) => (
               <div key={m.id} className={`message-container ${m.role}`}>
                 <div className="message-content">
                   <ChatMessage message={m}/>
                 </div>
-                {(m.role !== "user" && data && data[0] && data[0].sources.length > 0) ? (
+                {(m.role !== "user" && data && data.length > 0 && dataArrayHasCurrentPipeline(data,index)) ? (
                   <Accordion sx={{borderRadius:'10px'}} >
                     <AccordionSummary className='accordion-sources-color'
                       expandIcon={<ExpandMoreIcon />}
@@ -494,6 +487,7 @@ export default function Chat() {
                         display_list_items(data, index)
                       }
                       </List>
+                      
                     </AccordionDetails>
                   </Accordion>
                 ) : null}

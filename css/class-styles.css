@@ -17,29 +17,21 @@
   width: 0; /* This will hide the scrollbar on WebKit browsers (e.g., Chrome, Safari) */
 }
 
+.accordionSources {
+  width: 100%;
+  max-width: 90%;
+}
+
+.padding-container{
+  padding-left: 10%;
+  padding-right: 10%;
+}
 .sourceLinks:hover{
   color: rgb(71, 110, 216); /* Change the color here */
 }
 .message-content {
   display: flex;
   align-items: center;
-}
-
-.icon-container {
-  margin-right: 10px;
-  min-width: 30px;
-}
-
-.icon {
-  font-size: 24px;
-}
-
-.user.icon {
-  color: #007bff;
-}
-
-.ai.icon {
-  color: #4caf50;
 }
 
 .header-flex {
