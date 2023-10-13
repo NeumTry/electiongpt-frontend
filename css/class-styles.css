@@ -107,7 +107,6 @@
   background-color: #2c2c2c;
 }
 
-
 .submission-button {
   padding: 8px 16px;
   color: #fff;
@@ -131,7 +130,8 @@
 }
 
 .accordion-sources-color {
-  background-color: #a7a4a4; /* Add your preferred shade of grey here */
+  background-color: #7c7b7b; /* Add your preferred shade of grey here */
+  color: #d5d2d2;
 }
 
 .header-background {

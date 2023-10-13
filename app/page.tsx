@@ -84,7 +84,6 @@ export default function Chat() {
     padding: theme.spacing(0, 2),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
   }));
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -151,6 +150,10 @@ export default function Chat() {
 
   const handleFeedbackButtonClose = () => {
     setFeedbackModal(false);
+  };
+
+  const handleCandidateModalClose = () => {
+    setOpenModal(false);
   };
 
 
@@ -239,8 +242,7 @@ export default function Chat() {
     transform: 'translate(-50%, -50%)',
     width: 400,
     bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
+    borderRadius:1,
     p: 4,
   };
 
@@ -299,12 +301,16 @@ export default function Chat() {
       </Modal>
       <Modal
         open={openModal}
-        // onClose={handleModalClose}
+        onClose={handleCandidateModalClose}
       >
         <Box sx={styleBoxModal}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Choosing another candidate will clear the current conversation about {candidateChosen.name}. Do you want to continue?
+          <Typography id="modal-modal-title" variant="h6">
+            Choosing another candidate will clear the current conversation about {candidateChosen.name}
           </Typography>
+          <Typography variant="caption">
+            Do you want to continue?
+          </Typography>
+          <br></br>
           <Button onClick={handleChangeCandidateModalClick} color="success">
             Yes
           </Button>
@@ -473,13 +479,11 @@ export default function Chat() {
                   <ChatMessage message={m}/>
                 </div>
                 {(m.role !== "user" && data && data.length > 0 && dataArrayHasCurrentPipeline(data,index)) ? (
-                  <Accordion sx={{borderRadius:'10px'}} >
+                  <Accordion sx={{borderRadius:'3px', backgroundColor:'#7c7b7b'}} >
                     <AccordionSummary className='accordion-sources-color'
                       expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
                     >
-                      <Typography variant="h6">Sources used</Typography>
+                      <Typography color={'#d5d2d2'} variant="h6">Sources used</Typography>
                     </AccordionSummary>
                     <AccordionDetails className='accordion-sources-color'>
                       <List>
