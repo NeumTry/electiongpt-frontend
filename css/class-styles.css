@@ -130,7 +130,12 @@
 }
 
 .accordion-sources-color {
-  background-color: #7c7b7b; /* Add your preferred shade of grey here */
+  background-color: #1f1f1f; /* Add your preferred shade of grey here */
+  color: #d5d2d2;
+}
+
+.accordion-sources-color-details {
+  background-color: #090909; /* Add your preferred shade of grey here */
   color: #d5d2d2;
 }
 

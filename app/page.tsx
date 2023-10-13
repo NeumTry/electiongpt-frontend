@@ -7,7 +7,6 @@ import Drawer from '@mui/material/Drawer';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
@@ -332,21 +331,29 @@ export default function Chat() {
           </Typography> */}
         </Box>
       </Modal>
+      <header className={`header-background sticky top-0 z-50 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl relative ${matches ? 'ml-[400px]' : ''}`}>
+        {/* Left Side */}
+        <div className="flex items-center">
+          {!matches && (
+            <IconButton onClick={toggleSidebar}>
+              <MenuIcon className='white-icon'/>
+            </IconButton>
+          )}
+        </div>
 
-      <header className={`header-background sticky top-0 z-50 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl ${matches ? 'ml-[400px]' : ''}`}>
-      <div className="flex items-center">
-        {!matches && <IconButton onClick={toggleSidebar}>
-          <MenuIcon className='white-icon'/>
-        </IconButton>}
-      </div>
-      {matches && <Typography className="flex items-center text-[#e0e0e0]" >
-        🗳️ ElectionGPT
-        </Typography>}
-      <div className="flex items-center justify-end space-x-2">
-        <Button className="header-button" onClick={toggleAbout}>About</Button>
-        <Button onClick={handleFeedbackButton} className="header-button">Feedback</Button>
-      </div>
-    </header>      
+        {/* Centered Typography */}
+        {matches && (
+          <Typography className="absolute left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 text-[#e0e0e0]">
+            🗳️ ElectionGPT
+          </Typography>
+        )}
+
+        {/* Right Side */}
+        <div className="flex items-center justify-end space-x-2">
+          <Button className="header-button" onClick={toggleAbout}>About</Button>
+          <Button onClick={handleFeedbackButton} className="header-button">Feedback</Button>
+        </div>
+      </header>
     <Drawer anchor="left" open={sidebarOpen} variant={matches ? 'permanent' : 'temporary'}>
       <div style={{width:400, paddingLeft:20, paddingRight:20}}>
         <DrawerHeader className="header-flex">
@@ -358,6 +365,7 @@ export default function Chat() {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>}
         </DrawerHeader>
+        <br/>
         {(tabValue == 0) && ( <>
         <Typography variant="h4" gutterBottom>
         🗳️ ElectionGPT
@@ -478,8 +486,9 @@ export default function Chat() {
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
           {candidateChosen.name == "" ? "Select a candidate to start chatting" : "Chat about " + candidateChosen.name } 
           <br/>
-          {(candidateChosen.name == "" && !matches) && <Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button>}
+          {(candidateChosen.name == "" && !matches) && <><br/><Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button></>}
         </Typography>
+        <br/>
         <div className={`message-container ${!matches ? 'padding-container' : 'px-20'}`} style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0
           ? messages.map((m:any, index:any) => (
@@ -488,13 +497,13 @@ export default function Chat() {
                   <ChatMessage message={m}/>
                 </div>
                 {(m.role !== "user" && data && data.length > 0 && dataArrayHasCurrentPipeline(data,index)) ? (
-                  <Accordion sx={{borderRadius:'3px', backgroundColor:'#7c7b7b'}} >
-                    <AccordionSummary className='accordion-sources-color'
-                      expandIcon={<ExpandMoreIcon />}
+                  <Accordion className='accordion-sources-color rounded-md'>
+                    <AccordionSummary className='accordion-sources-color rounded-md min-h-[1rem] h-10'
+                      expandIcon={<ExpandMoreIcon  style={{color:'#4e4e4e',}}/>}
                     >
                       <Typography color={'#d5d2d2'} variant="h6">Sources used</Typography>
                     </AccordionSummary>
-                    <AccordionDetails className='accordion-sources-color'>
+                    <AccordionDetails className='accordion-sources-color-details rounded-b-md'>
                       <List>
                       {
                         display_list_items(data, index)
@@ -504,6 +513,7 @@ export default function Chat() {
                     </AccordionDetails>
                   </Accordion>
                 ) : null}
+                <br/>
                 {index !== messages.length - 1 && <div className="divider" />}
               </div>
             ))
