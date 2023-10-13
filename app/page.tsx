@@ -413,7 +413,7 @@ export default function Chat() {
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
-              id="panel1a-header"
+              id="panel1a-header" 
             >
               <Typography>Democrat Candidates</Typography>
             </AccordionSummary>
