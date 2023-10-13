@@ -404,7 +404,7 @@ export default function Chat() {
             </div>
             )}
             {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
-            </Grid>
+            </Grid> 
           </AccordionDetails>
         </Accordion>
         <br></br>
