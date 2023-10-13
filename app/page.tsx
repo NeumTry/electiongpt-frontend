@@ -86,6 +86,15 @@ export default function Chat() {
     ...theme.mixins.toolbar,
   }));
 
+  const DrawerHeaderAbout = styled('div')(({ theme }:any) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 2),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    justifyContent: 'flex-end'
+  }));
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     if(newValue === 1){
@@ -430,11 +439,11 @@ export default function Chat() {
       </Drawer>
     <Drawer anchor='right' open={aboutOpen} variant='temporary'>
       <div style={{width:400, paddingLeft:'10%', paddingRight:'10%'}}>
-        <DrawerHeader>
+        <DrawerHeaderAbout>
           <IconButton onClick={handleAboutClose}>
             <CloseIcon/>
           </IconButton>
-        </DrawerHeader>
+        </DrawerHeaderAbout>
           <Typography variant="h4" gutterBottom>
             About
           </Typography>
