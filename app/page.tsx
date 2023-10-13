@@ -384,7 +384,7 @@ export default function Chat() {
           <Typography variant="h6" gutterBottom>
             Choose a candidate
         </Typography>
-          <Accordion>
+          <Accordion >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -497,13 +497,14 @@ export default function Chat() {
                   <ChatMessage message={m}/>
                 </div>
                 {(m.role !== "user" && data && data.length > 0 && dataArrayHasCurrentPipeline(data,index)) ? (
-                  <Accordion className='accordion-sources-color rounded-md'>
-                    <AccordionSummary className='accordion-sources-color rounded-md min-h-[1rem] h-10'
+                  <Accordion className='accordion-sources-color' sx={{borderRadius:'4px'}}>
+                    <AccordionSummary className='accordion-sources-color min-h-[1rem] h-10'
+                      sx={{borderRadius:'4px'}}
                       expandIcon={<ExpandMoreIcon  style={{color:'#4e4e4e',}}/>}
                     >
                       <Typography color={'#d5d2d2'} variant="h6">Sources used</Typography>
                     </AccordionSummary>
-                    <AccordionDetails className='accordion-sources-color-details rounded-b-md'>
+                    <AccordionDetails className='accordion-sources-color-details' sx={{borderBottomLeftRadius:'4px' , borderBottomRightRadius:'4px'}}>
                       <List>
                       {
                         display_list_items(data, index)
