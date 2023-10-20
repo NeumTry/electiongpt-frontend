@@ -43,13 +43,13 @@ export default function Chat() {
     {'name': 'Ron DeSantis', 'pipeline_id': 'ba9ffc9c-47c0-4e40-ba9f-cafee3f3afbb','party':'republican'},
     {'name': 'Larry Elder', 'pipeline_id': '9bdc83ad-7b99-404c-886d-bd0f0ffab973', 'party':'republican'},
     {'name': 'Nikki Haley', 'pipeline_id': '76c70a2d-4237-4271-9f46-7ff572fcc28b','party':'republican'},
-    {'name': 'Will Hurd', 'pipeline_id': '4fec3803-b539-44bb-ae62-715f0aa59957','party':'republican'},
+    // {'name': 'Will Hurd', 'pipeline_id': '4fec3803-b539-44bb-ae62-715f0aa59957','party':'republican'}, // Withdrew
     {'name': 'Asa Hutchinson', 'pipeline_id': '9e6fbe35-b650-4aaf-bb39-ed34aa5b1a4e','party':'republican'},
     {'name': 'Perry Johnson', 'pipeline_id': 'fd827a7f-640c-4641-b402-3b9e92d87ace','party':'republican'},
     {'name': 'Mike Pence', 'pipeline_id': '3219ff3d-48d5-4265-81b9-775de156f273','party':'republican'},
-    {'name': 'Vivek Ramaswamy', 'pipeline_id': 'd3ab4948-0481-45f0-9f52-534e1809515e','party':'republican'}, // try this new one: fue shabat no logre test - d3ab4948-0481-45f0-9f52-534e1809515e
+    {'name': 'Vivek Ramaswamy', 'pipeline_id': 'd3ab4948-0481-45f0-9f52-534e1809515e','party':'republican'},
     {'name': 'Tim Scott', 'pipeline_id': '1b25d129-402f-488b-a894-a0ef6353e3e0','party':'republican'},
-    {'name': 'Corey Stapleton', 'pipeline_id': '1416885a-6cc4-4f0b-88f7-1d14d49e717c','party':'republican'},
+    // {'name': 'Corey Stapleton', 'pipeline_id': '1416885a-6cc4-4f0b-88f7-1d14d49e717c','party':'republican'}, // Withdrew
     {'name': 'Donald Trump', 'pipeline_id': '252aced6-ac42-41bf-b55e-42db4131404a','party':'republican'},
 ]
 
