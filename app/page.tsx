@@ -53,11 +53,12 @@ export default function Chat() {
     {'name': 'Donald Trump', 'pipeline_id': '252aced6-ac42-41bf-b55e-42db4131404a','party':'republican'},
 ]
 
-// todo
   const democraticCandidates = [
     {'name': 'Joe Biden', 'pipeline_id': 'fd4fade4-20cf-4c24-a811-2292daa6152f', 'party':'democratic'},
-    {'name': 'Robert F Kennedy', 'pipeline_id': 'a86d3486-a693-4370-8eda-bbe5efc3bb7e', 'party':'democratic'},
     {'name': 'Marianne Williamson', 'pipeline_id': 'cf0127f0-40ed-4cee-8d4f-41d7ef06dc1c', 'party':'democratic'},
+  ]
+  const independentCandidates = [
+    {'name': 'Robert F Kennedy', 'pipeline_id': 'a86d3486-a693-4370-8eda-bbe5efc3bb7e', 'party':'independent'},
   ]
   // const { user } = useClerk();
   const matches = useMediaQuery('(min-width:960px)');
@@ -422,6 +423,31 @@ export default function Chat() {
             {democraticCandidates.map( candidate =>
               <div key={candidate.name} style={{paddingLeft:'5px', paddingRight:'5px'}}>
                 <Button variant="outlined" onClick={handleCandidateChosenClick(candidate)}>
+                {candidate.name}
+              </Button>
+              <br></br>
+              <br></br>
+              </div>
+              )}
+            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
+            </Grid>
+            </AccordionDetails>
+          </Accordion>
+          <br></br>
+          <br></br>
+          <Accordion>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header" 
+            >
+              <Typography>Independent Candidates</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            <Grid container spacing={2}>
+            {independentCandidates.map( candidate =>
+              <div key={candidate.name} style={{paddingLeft:'5px', paddingRight:'5px'}}>
+                <Button variant="outlined" color="warning" onClick={handleCandidateChosenClick(candidate)}>
                 {candidate.name}
               </Button>
               <br></br>

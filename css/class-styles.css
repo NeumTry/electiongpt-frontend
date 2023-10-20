@@ -91,6 +91,10 @@
   background-color: #1d47d0;
 }
 
+.submission-button-color-independent{
+  background-color: #c26a06;
+}
+
 .submission-button-color-standard{
   background-color: rgb(0, 0, 0);
 }
@@ -101,6 +105,10 @@
 
 .submission-button-color-democratic:hover {
   background-color: rgb(51, 104, 240);
+}
+
+.submission-button-color-independent:hover {
+  background-color: rgb(238, 143, 18);
 }
 
 .submission-button-color-standard:hover {
