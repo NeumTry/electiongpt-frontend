@@ -1,30 +1,42 @@
 # ElectionGPT - Powered by Neum AI
 
-This example shows how to use the [Vercel AI SDK](https://sdk.vercel.ai/docs) with [Next.js](https://nextjs.org/) and [OpenAI](https://openai.com) to create a ChatGPT-like AI-powered streaming chat bot.
+[Live Here](https://electiongpt.ai/)
 
-## Deploy your own
+App that allows users to talk to presidential candidates for the US 2024 election. Leverage Neum AI as its backend to collect data from various data sources.
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=ai-sdk-example):
+Candidates included:
+- Ryan Binkley - Republican
+- Doug Burgum - Republican
+- Chris Christie - Republican
+- Ron DeSantis - Republican
+- Larry Elder - Republican
+- Nikki Haley - Republican
+- Asa Hutchinson - Republican
+- Perry Johnson - Republican
+- Mike Pence - Republican
+- Vivek Ramaswamy - Republican
+- Tim Scott - Republican
+- Donald Trump - Republican
+- Joe Biden - Democratic
+- Marianne Williamson - Democratic
+- Robert F Kennedy - Independent
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fai%2Ftree%2Fmain%2Fexamples%2Fnext-openai&env=OPENAI_API_KEY&envDescription=OpenAI%20API%20Key&envLink=https%3A%2F%2Fplatform.openai.com%2Faccount%2Fapi-keys&project-name=vercel-ai-chat-openai&repository-name=vercel-ai-chat-openai)
+Data sources included:
+- Wikipedia
+- Ballotpedia
+- Candidate Websites
+- Published government plans
+- Tweets
+- Interview transcripts
 
-## How to use
+## Enable data pipelines with Neum AI
+*Note:* You will need API Keys for [APIFY](https://apify.com/) and [OpenAI](https://openai.com/) to access the data. In addition, you will need a WCS (Weaviate Cloud Service) cluster that can be created for [free](https://weaviate.io/developers/wcs/quickstart).
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+1. Sign up at [Neum.AI](dashboard.neum.ai)
+2. Get your API Key under Dashboard > Settings
+3. [Create Pipelines](https://docs.neum.ai/docs/build-with-apis) using this [sample configuration](https://github.com/NeumTry/electiongpt-frontend/blob/master/sample-pipeline-config.json). We will add additional configuration soon.
 
-```bash
-npx create-next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
-```
-
-```bash
-yarn create next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
-```
-
-```bash
-pnpm create next-app --example https://github.com/vercel/ai/tree/main/examples/next-openai next-openai-app
-```
-
-To run the example locally you need to:
+## Run frontend
 
 1. Sign up at [OpenAI's Developer Platform](https://platform.openai.com/signup).
 2. Go to [OpenAI's dashboard](https://platform.openai.com/account/api-keys) and create an API KEY.
