@@ -1,5 +1,7 @@
 # ElectionGPT - Powered by Neum AI
 
+![image](https://github.com/NeumTry/electiongpt-frontend/assets/10717976/e40358cb-8054-4a16-8151-aaa0fafd9724)
+
 [Live Here](https://electiongpt.ai/)
 
 App that allows users to talk to presidential candidates for the US 2024 election. Leverage Neum AI as its backend to collect data from various data sources.
