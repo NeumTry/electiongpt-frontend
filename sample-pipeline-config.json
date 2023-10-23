@@ -1,0 +1,127 @@
+//Example JSON Configuration for Neum AI pipeline for Ron DeSantis
+{
+  "source": [
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "shanes~tweet-flash",
+        "apify_metadata": {
+          "from_user": [
+            "RonDeSantis"
+          ],
+          "only_tweets": true,
+          "max_tweets": 50
+        }
+      }
+    },
+    {
+      "source_name": "neum_website",
+      "metadata": {
+        "url": "https://en.wikipedia.org/wiki/Ron_DeSantis"
+      }
+    },
+    {
+      "source_name": "neum_website",
+      "metadata": {
+        "url": "https://en.wikipedia.org/wiki/Ron_DeSantis_2024_presidential_campaign"
+      }
+    },
+    {
+      "source_name": "neum_website",
+      "metadata": {
+        "url": "https://rondesantis.com/articles/meet-ron-desantis/"
+      }
+    },
+    {
+      "source_name": "neum_website",
+      "metadata": {
+        "url": "https://ballotpedia.org/Ron_DeSantis_presidential_campaign,_2024"
+      }
+    },
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "apify~website-content-crawler",
+        "apify_metadata": {
+          "startUrls": [
+            {
+              "url": "https://www.rev.com/blog/transcripts/florida-governor-ron-desantis-announces-2024-presidential-run-on-twitter-spaces-with-elon-musk-transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "apify~website-content-crawler",
+        "apify_metadata": {
+          "startUrls": [
+            {
+              "url": "https://www.rev.com/blog/transcripts/florida-governor-ron-desantis-kicks-off-his-2024-presidential-campaign-in-iowa-transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "apify~website-content-crawler",
+        "apify_metadata": {
+          "startUrls": [
+            {
+              "url": "https://www.rev.com/blog/transcripts/desantis-speaks-at-iowa-roast-and-ride-event-transcripthttps://www.rev.com/blog/transcripts/desantis-unveils-new-immigration-and-border-policy-transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "apify~website-content-crawler",
+        "apify_metadata": {
+          "startUrls": [
+            {
+              "url": "https://www.rev.com/blog/transcripts/desantis-unveils-new-immigration-and-border-policy-transcript"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "source_name": "apify",
+      "metadata": {
+        "api_key": "APIFY KEY",
+        "actor_name": "apify~website-content-crawler",
+        "apify_metadata": {
+          "startUrls": [
+            {
+              "url": "https://www.rev.com/blog/transcripts/jake-tapper-exclusive-interview-with-fl-gov-ron-desantis-transcript"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sink": {
+    "sink_name": "weaviate",
+    "metadata": {
+      "url": "WCS URL",
+      "api_key": "WCS API KEY",
+      "class_name": "RonDeSantis_pipeline"
+    }
+  },
+  "embed": {
+    "embed_name": "openai",
+    "metadata": {
+      "api_key": "OPEN AI API KEY",
+    }
+  },
+}
