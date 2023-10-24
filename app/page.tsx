@@ -19,6 +19,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import ListItem from '@mui/material/ListItem';
 
 import Box from '@mui/material/Box';
@@ -64,6 +66,7 @@ export default function Chat() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [sessionId, setSessionId] = useState(uuid());
+  const [hotQuestions, setHotQuestions] = useState([]);
   const [candidateInPreview, setCandidateInPreview] = useState({'name':'','pipeline_id':'', 'party':''})
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
   const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id, "sessionId":sessionId, "candidateParty":candidateChosen.party}});
@@ -240,6 +243,18 @@ export default function Chat() {
     setSidebarOpen(matches);
   }, [matches]);
 
+
+  useEffect(() => {
+    if(hotQuestions.length == 0){
+      fetch('/api/hot-questions')
+        .then((res) => res.json())
+        .then((data) => {
+          setHotQuestions(data.data)
+        })
+    }
+  }, [])
+ 
+
   const styleBoxModal = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -251,6 +266,20 @@ export default function Chat() {
     p: 4,
   };
 
+  // let sample_data_questions = [{id:"12",candidate:"Kennedy", "question":'Did kennedy go for independent'}, {id:"24",candidate:"Vivek","question":'Thoughts on Gender?'}]
+  function get_hot_questions(){
+    if(hotQuestions == null){
+      return <div>Could not load hot questions... - please email us at founders@tryneum.com!</div>
+    }
+    if(hotQuestions.length == 0){
+      return <div>Loading hot questions...</div>
+    }
+    return hotQuestions.map((elem:any) => (
+      <ListItem key={elem.id} sx={{ display: 'list-item' }}>
+        {elem.candidate_name} | {elem.question}
+      </ListItem>
+    ))
+  }
   function display_list_items(data:any, index: any){
     if(index -2 < 0)
       index = 0
@@ -368,9 +397,6 @@ export default function Chat() {
           </Typography>
           <Typography paragraph>
           ElectionGPT helps you learn about the proposals of the different presidential candidates. It is a chat interface that leverages AI contextualized by the candidates proposals and other information about them. 
-          <br></br>
-          <br></br>
-          Pick a candidate below. List updated as of 10/2/2023. 
           <br></br>
           <br></br>
           </Typography>
@@ -499,10 +525,20 @@ export default function Chat() {
     <div className={`main-content ${matches ? 'ml-[400px]' : ''}`}>
       <div className="flex flex-col w-full max-w-md pt-10 mx-auto stretch">
         <Typography variant="h4" gutterBottom style={{ textAlign: 'center' }}>
-          {candidateChosen.name == "" ? "Select a candidate to start chatting" : "Chat about " + candidateChosen.name } 
+          {candidateChosen.name == "" ? "Select a candidate to start chatting" : "Chat with (AI) " + candidateChosen.name } 
           <br/>
           {(candidateChosen.name == "" && !matches) && <><br/><Button onClick={toggleSidebar} className='bg-blue-600 text-gray-900 font-semibold hover:bg-blue-400'>Choose</Button></>}
         </Typography>
+        <Card className='accordion-sources-color' sx={{ minWidth: 275 }}>
+          <CardContent>
+            <Typography sx={{ fontSize: 15 }} gutterBottom>
+            🔥Hot questions - refreshed daily🔥
+            </Typography>
+            {
+              get_hot_questions()
+            }
+          </CardContent>
+        </Card>
         <br/>
         <div className={`message-container ${!matches ? 'padding-container' : 'px-20'}`} style={{ maxHeight: '75vh', overflowY: 'auto'}} ref={chatContainerRef}>
           {messages.length > 0

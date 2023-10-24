@@ -46,6 +46,22 @@
   width: 100%;
   margin: 10px 0;
 }
+
+.form-div{
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #2e2e2e;
+}
+
 .submission-form {
   position: fixed;
   bottom: 0;
