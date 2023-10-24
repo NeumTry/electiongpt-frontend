@@ -34,7 +34,8 @@ import Textarea from '@mui/joy/Textarea';
 import { SocialIcon } from 'react-social-icons'
 import Input from '@mui/material/Input';
 
-// New pipelines as of 10/6
+import { v4 as uuid } from 'uuid';
+
 export default function Chat() {
   const republicanCandidates = [
     {'name': 'Ryan Binkley', 'pipeline_id': '1a2b7503-08b2-4a32-90e0-ba4cc3a33499','party':'republican'},
@@ -43,13 +44,11 @@ export default function Chat() {
     {'name': 'Ron DeSantis', 'pipeline_id': 'ba9ffc9c-47c0-4e40-ba9f-cafee3f3afbb','party':'republican'},
     {'name': 'Larry Elder', 'pipeline_id': '9bdc83ad-7b99-404c-886d-bd0f0ffab973', 'party':'republican'},
     {'name': 'Nikki Haley', 'pipeline_id': '76c70a2d-4237-4271-9f46-7ff572fcc28b','party':'republican'},
-    // {'name': 'Will Hurd', 'pipeline_id': '4fec3803-b539-44bb-ae62-715f0aa59957','party':'republican'}, // Withdrew
     {'name': 'Asa Hutchinson', 'pipeline_id': '9e6fbe35-b650-4aaf-bb39-ed34aa5b1a4e','party':'republican'},
     {'name': 'Perry Johnson', 'pipeline_id': 'fd827a7f-640c-4641-b402-3b9e92d87ace','party':'republican'},
     {'name': 'Mike Pence', 'pipeline_id': '3219ff3d-48d5-4265-81b9-775de156f273','party':'republican'},
     {'name': 'Vivek Ramaswamy', 'pipeline_id': 'd3ab4948-0481-45f0-9f52-534e1809515e','party':'republican'},
     {'name': 'Tim Scott', 'pipeline_id': '1b25d129-402f-488b-a894-a0ef6353e3e0','party':'republican'},
-    // {'name': 'Corey Stapleton', 'pipeline_id': '1416885a-6cc4-4f0b-88f7-1d14d49e717c','party':'republican'}, // Withdrew
     {'name': 'Donald Trump', 'pipeline_id': '252aced6-ac42-41bf-b55e-42db4131404a','party':'republican'},
 ]
 
@@ -60,14 +59,14 @@ export default function Chat() {
   const independentCandidates = [
     {'name': 'Robert F Kennedy', 'pipeline_id': 'a86d3486-a693-4370-8eda-bbe5efc3bb7e', 'party':'independent'},
   ]
-  // const { user } = useClerk();
   const matches = useMediaQuery('(min-width:960px)');
   const [sidebarOpen, setSidebarOpen] = useState(matches);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [sessionId, setSessionId] = useState(uuid());
   const [candidateInPreview, setCandidateInPreview] = useState({'name':'','pipeline_id':'', 'party':''})
   const [candidateChosen, setCandidateChosen] = useState({'name':'','pipeline_id':'', 'party':''})
-  const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id}});
+  const { messages, input, setInput, setMessages, handleInputChange, handleSubmit, data, metadata} = useChat({headers:{'candidateName':candidateChosen.name, 'candidatePipeline':candidateChosen.pipeline_id, "sessionId":sessionId, "candidateParty":candidateChosen.party}});
   const [snackbarOpen, setSnackbarOpen] = useState({'state':false,'message':""});
   const [successSnackbarFeedback, setSuccessSnackbarFeedback] = useState(false);
   const [debateModeClicked, setDebateModeClicked] = useState(false);
@@ -82,7 +81,6 @@ export default function Chat() {
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 2),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   }));
 
@@ -90,7 +88,6 @@ export default function Chat() {
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 2),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end'
   }));
@@ -116,14 +113,13 @@ export default function Chat() {
   const handleCandidateChosenClick = (candidate:any) => () => {
     va.track("Clicked Candidate button",{candidate_name:candidate.name})
     
-    // Display alert saying that the conv history will get deleted if they change.. prompting to sign up.
     if(candidateChosen.name != "" && candidateChosen.name !== candidate.name){
       setOpenModal(true)
       setCandidateInPreview(candidate)
       return
     }
     setCandidateChosen(candidate)
-    setSidebarOpen(false); // on mobile, set it to false if candidate is chosen so we return to the main chat panel
+    setSidebarOpen(false); 
   };
 
   const handleSubmitForm = (e:any) => {
@@ -193,7 +189,6 @@ export default function Chat() {
   };
 
   const submitFeedbackForm = async () => {
-    // send request to mongo, display success, clear textarea
     if(feedbackInput === ""){
       setSnackbarOpen({'state':true,'message':"Please write some feedback first!"});
     }
@@ -203,6 +198,7 @@ export default function Chat() {
           method:'POST',
           headers: {
             'Content-Type': 'application/json',
+            "sessionId":sessionId
           },
           body:JSON.stringify({ feedback: {feedbackContent:feedbackInput, emailAddress:emailInput} })
         });
@@ -327,9 +323,6 @@ export default function Chat() {
             Cancel
           </Button>
           <br></br>
-          {/* <Typography variant="caption" color="gray">
-            <i>If you wish to save the chat history upon changing candidates, sign up <Link style={{textDecoration:"underline"}} href="/signup">here</Link>, it's free and takes 5 secs!</i>
-          </Typography> */}
         </Box>
       </Modal>
       <header className={`header-background sticky top-0 z-50 flex items-center justify-between h-16 px-4 border-b shrink-0 bg-gradient-to-b from-background/10 via-background/50 to-background/80 backdrop-blur-xl relative ${matches ? 'ml-[400px]' : ''}`}>
@@ -342,7 +335,6 @@ export default function Chat() {
           )}
         </div>
 
-        {/* Centered Typography */}
         {matches && (
           <Typography className="absolute left-1/2 transform -translate-x-1/2 top-1/2 -translate-y-1/2 text-[#e0e0e0]">
             🗳️ ElectionGPT
@@ -404,7 +396,6 @@ export default function Chat() {
             <br></br>
             </div>
             )}
-            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
             </Grid> 
           </AccordionDetails>
         </Accordion>
@@ -429,7 +420,6 @@ export default function Chat() {
               <br></br>
               </div>
               )}
-            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
             </Grid>
             </AccordionDetails>
           </Accordion>
@@ -454,7 +444,6 @@ export default function Chat() {
               <br></br>
               </div>
               )}
-            {/* We can probably make this fancier with a box or something so that they are not each in one line - Can we use their pictures?*/}
             </Grid>
             </AccordionDetails>
           </Accordion>

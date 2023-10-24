@@ -1,15 +1,14 @@
 // ./app/api/chat/route.ts
 import OpenAI from 'openai';
 import { OpenAIStream, StreamingTextResponse , experimental_StreamData} from 'ai';
-import { kv } from '@vercel/kv';
 import { v4 as uuid } from 'uuid';
 
-// Create an OpenAI API client (that's edge friendly!)
+import { sql } from "@vercel/postgres";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
 });
 
-// IMPORTANT! Set the runtime to edge
 export const runtime = 'edge';
 
 function get_formatted_results(results:any){
@@ -23,11 +22,22 @@ function get_formatted_results(results:any){
   return formatted_results
 
 }
+async function insertAnonymousMessageInPostgres(lastMessage: string, sessionId: string|null, candidateParty: string|null, candidateName: string|null){
+  let messageId = uuid()
+  try{
+    await sql`INSERT INTO messages (id, message, candidate_name, candidate_party, session_id) VALUES(${messageId}, ${lastMessage}, ${candidateName}, ${candidateParty}, ${sessionId});`;
+  }
+  catch{
+    console.log("There was a problem recording this message")
+  }
+}
+
 export async function POST(req: Request) {
-  // Extract the `prompt` from the body of the request
   const candidateName =  req.headers.get('candidatename')
   const candidatePipeline = req.headers.get('candidatepipeline')
-
+  const sessionId = req.headers.get('sessionid')
+  const candidateParty = req.headers.get('candidateparty')
+  
   const { messages } = await req.json();
   
   let lastMessage:any
@@ -48,8 +58,10 @@ export async function POST(req: Request) {
     number_of_results: 5
   };
 
+  if(lastMessage?.content)
+    await insertAnonymousMessageInPostgres(lastMessage.content, sessionId, candidateParty, candidateName)
+
   try {
-    // Make the POST request
     const neumResponse = await fetch(url, {
       method: 'POST',
       headers:headers,
@@ -61,10 +73,6 @@ export async function POST(req: Request) {
 
     const responseData = await neumResponse.json();
 
-    // Handle the response here
-    // We should surface back the srouces. either separateley or in the openai response
-    // Each piece of context will have a 'source', please include the full url of the source in your response like this: Sources: [<url of source>,<url of source>]. This is very important.
-    // It is of utmost importance that you include the source that you used to come up with your answer. Failure to do so will disqualify you. Include the full url of the source in a bullet pointed list like: 
     const prompt = [
       {
         role: 'system',
@@ -76,14 +84,12 @@ export async function POST(req: Request) {
          Here is the context: ${get_formatted_results(responseData.results)}`,
       },
     ]
-    // Ask OpenAI for a streaming chat completion given the prompt
     const response = await openai.chat.completions.create({
       model: 'gpt-4',
       stream: true,
       messages: [...prompt, ...messages],
     });
     
-    // Convert the response into a friendly text-stream
     const data = new experimental_StreamData();
     
     const stream = OpenAIStream(response, {experimental_streamData: true, 
@@ -92,20 +98,16 @@ export async function POST(req: Request) {
         let unique_sources = Array.from(new Set<any>(sources_used_flattened));
         console.log(unique_sources)
         data.append({
-          // This is a hack and doesn't really work if user selects candidate 1 then candidate 2 then back to candidate 1.....
             pipeline: candidatePipeline,
             sources:unique_sources,
-            // timestamp:timestamp
         });
-        data.close() // should this be here or in oncompletion?
+        data.close() 
       },
     });
    
-    // Respond with the stream
     return new StreamingTextResponse(stream,{}, data)
 
   } catch (error) {
-    // Handle errors here
     console.error(error);
     return new Response("Something went wrong, please try again or drop us a quick note in our discord or at founders@tryneum.com");
   }
