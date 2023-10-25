@@ -1,6 +1,6 @@
 # ElectionGPT - Powered by Neum AI
 
-![image](https://github.com/NeumTry/electiongpt-frontend/assets/10717976/e40358cb-8054-4a16-8151-aaa0fafd9724)
+![image](https://github.com/NeumTry/electiongpt-frontend/assets/10717976/5dcc6b0d-ab85-43de-92f0-54534b38f1e3)
 
 [Live Here](https://electiongpt.ai/)
 
