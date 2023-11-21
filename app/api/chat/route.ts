@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   else
     lastMessage = messages[messages.length - 1]
 
-  const url = `https://api.neum.ai/v1/pipelines/${candidatePipeline}/search`;
+  const url = `https://neum-old.fly.dev/v1/pipelines/${candidatePipeline}/search`;
   const headers = {
     'neum-api-key': process.env.NEUM_API_KEY  || '',
     'Content-Type': 'application/json'
